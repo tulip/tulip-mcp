@@ -1,0 +1,26 @@
+{
+  "name": "updateTable",
+  "description": "Updates a Tulip Table. This modifies table structure and can affect existing data. Corresponds to PUT /tables/{tableId}. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table to update"
+      },
+      "tableData": {
+        "type": "object",
+        "description": "Updated table data"
+      }
+    },
+    "required": [
+      "tableId",
+      "tableData"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/tables/:tableId"
+}

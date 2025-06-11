@@ -1,0 +1,31 @@
+{
+  "name": "listUserUserGroups",
+  "description": "Returns an array of user group IDs that the user is currently a member of. Corresponds to GET /api/users/v1/users/{userId}/user-groups. Requires `users:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string",
+        "description": "The ID of the user to retrieve the assigned user groups."
+      },
+      "limit": {
+        "type": "integer",
+        "description": "The number of items to return in the response."
+      },
+      "offset": {
+        "type": "integer",
+        "description": "The number of items to skip before collecting the result."
+      },
+      "filter": {
+        "type": "string",
+        "description": "Filters the result using OData 4.01 syntax. Supports filtering on the userGroupId field. Only supports the eq and or operators."
+      }
+    },
+    "required": ["userId"]
+  },
+  "category": "read-only",
+  "type": "user",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/users/v1/users/:userId/user-groups"
+}

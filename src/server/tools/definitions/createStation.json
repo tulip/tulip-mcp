@@ -1,0 +1,21 @@
+{
+  "name": "createStation",
+  "description": "Creates a new station. Corresponds to POST /api/stations/v1/stations. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationData": {
+        "type": "object",
+        "description": "Station data for creating new station"
+      }
+    },
+    "required": [
+      "stationData"
+    ]
+  },
+  "category": "write",
+  "type": "station",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/api/stations/v1/stations"
+}

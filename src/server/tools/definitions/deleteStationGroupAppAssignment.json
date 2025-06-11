@@ -1,0 +1,26 @@
+{
+  "name": "deleteStationGroupAppAssignment",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Deletes an app assignment from a station group. Corresponds to DELETE /api/stations/v1/station-groups/{stationGroupId}/app-assignments/{appAssignmentId}. Requires `stations:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationGroupId": {
+        "type": "string",
+        "description": "The ID of the station group"
+      },
+      "appAssignmentId": {
+        "type": "string",
+        "description": "The ID of the app assignment to delete"
+      }
+    },
+    "required": [
+      "stationGroupId",
+      "appAssignmentId"
+    ]
+  },
+  "category": "admin",
+  "type": "station-group",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/api/stations/v1/station-groups/:stationGroupId/app-assignments/:appAssignmentId"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "signUrls",
+  "description": "Signs cloud storage URLs. Corresponds to POST /signURLs. Requires appropriate scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "urls": {
+        "type": "array",
+        "description": "Array of URLs to sign",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "urls"
+    ]
+  },
+  "category": "write",
+  "type": "utility",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/signURLs"
+}

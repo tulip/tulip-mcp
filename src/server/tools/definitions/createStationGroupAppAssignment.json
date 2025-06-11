@@ -1,0 +1,26 @@
+{
+  "name": "createStationGroupAppAssignment",
+  "description": "Creates an app assignment for a station group. Corresponds to POST /api/stations/v1/station-groups/{stationGroupId}/app-assignments. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationGroupId": {
+        "type": "string",
+        "description": "The ID of the station group"
+      },
+      "appAssignmentData": {
+        "type": "object",
+        "description": "App assignment data"
+      }
+    },
+    "required": [
+      "stationGroupId",
+      "appAssignmentData"
+    ]
+  },
+  "category": "write",
+  "type": "station-group",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/api/stations/v1/station-groups/:stationGroupId/app-assignments"
+}

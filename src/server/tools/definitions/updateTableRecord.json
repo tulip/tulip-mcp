@@ -1,0 +1,31 @@
+{
+  "name": "updateTableRecord",
+  "description": "Updates a specific record in a Tulip Table. Corresponds to PUT /tables/{tableId}/records/{recordId}. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table"
+      },
+      "recordId": {
+        "type": "string",
+        "description": "The ID of the record to update"
+      },
+      "recordData": {
+        "type": "object",
+        "description": "Updated record data"
+      }
+    },
+    "required": [
+      "tableId",
+      "recordId",
+      "recordData"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/tables/:tableId/records/:recordId"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "listStationGroups",
+  "description": "Gets a paginated, filtered, and sorted list of station groups. Corresponds to GET /api/stations/v1/station-groups. Requires `stations:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "description": "Limit the number of items listed"
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Return documents after a certain offset"
+      },
+      "sort": {
+        "type": "string",
+        "description": "Sort the result by name, lastModified.at, and created.at. Separate by comma. Specify descending sort with a - character"
+      }
+    }
+  },
+  "category": "read-only",
+  "type": "station-group",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/stations/v1/station-groups"
+}

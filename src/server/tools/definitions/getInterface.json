@@ -1,0 +1,21 @@
+{
+  "name": "getInterface",
+  "description": "Gets details about a specific interface. Corresponds to GET /api/stations/v1/interfaces/{interfaceId}. Requires `stations:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "interfaceId": {
+        "type": "string",
+        "description": "The ID of the interface to retrieve"
+      }
+    },
+    "required": [
+      "interfaceId"
+    ]
+  },
+  "category": "read-only",
+  "type": "interface",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/stations/v1/interfaces/:interfaceId"
+}

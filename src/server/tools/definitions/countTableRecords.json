@@ -1,0 +1,21 @@
+{
+  "name": "countTableRecords",
+  "description": "Counts records in a Tulip Table. Corresponds to GET /tables/{tableId}/count. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table to count records in"
+      }
+    },
+    "required": [
+      "tableId"
+    ]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/count"
+}

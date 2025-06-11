@@ -1,0 +1,31 @@
+{
+  "name": "runTableAggregation",
+  "description": "Runs an aggregate function on a table field. Corresponds to GET /tables/{tableId}/runAggregation. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table"
+      },
+      "aggregationType": {
+        "type": "string",
+        "description": "Type of aggregation (sum, avg, count, etc.)"
+      },
+      "field": {
+        "type": "string",
+        "description": "Field to aggregate on"
+      }
+    },
+    "required": [
+      "tableId",
+      "aggregationType",
+      "field"
+    ]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/runAggregation"
+}

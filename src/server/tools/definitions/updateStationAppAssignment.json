@@ -1,0 +1,31 @@
+{
+  "name": "updateStationAppAssignment",
+  "description": "Updates an app assignment for a station. Corresponds to PUT /api/stations/v1/stations/{stationId}/app-assignments/{appAssignmentId}. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station"
+      },
+      "appAssignmentId": {
+        "type": "string",
+        "description": "The ID of the app assignment"
+      },
+      "appAssignmentData": {
+        "type": "object",
+        "description": "Updated app assignment data"
+      }
+    },
+    "required": [
+      "stationId",
+      "appAssignmentId",
+      "appAssignmentData"
+    ]
+  },
+  "category": "write",
+  "type": "station",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/api/stations/v1/stations/:stationId/app-assignments/:appAssignmentId"
+}

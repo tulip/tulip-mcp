@@ -1,0 +1,21 @@
+{
+  "name": "archiveStation",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Archives a station. This permanently removes the station from active use. Corresponds to POST /api/stations/v1/stations/{stationId}/archive. Requires `stations:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station to archive"
+      }
+    },
+    "required": [
+      "stationId"
+    ]
+  },
+  "category": "admin",
+  "type": "station",
+  "dangerous": true,
+  "httpType": "POST",
+  "url": "/api/stations/v1/stations/:stationId/archive"
+}

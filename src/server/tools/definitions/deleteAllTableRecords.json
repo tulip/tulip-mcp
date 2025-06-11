@@ -1,0 +1,21 @@
+{
+  "name": "deleteAllTableRecords",
+  "description": "[DANGEROUS] Deletes ALL records from a Tulip Table permanently. This will wipe all data in the table and cannot be undone. Use with extreme caution. Corresponds to DELETE /tables/{tableId}/records. Requires `tables:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table to delete all records from"
+      }
+    },
+    "required": [
+      "tableId"
+    ]
+  },
+  "category": "admin",
+  "type": "table",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/tables/:tableId/records"
+}

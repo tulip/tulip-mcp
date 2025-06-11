@@ -1,0 +1,24 @@
+{
+  "name": "deleteTableQuery",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Removes a Tulip Table query by id. Corresponds to DELETE /tables/{tableId}/query/{queryId}. Requires `tables:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "queryId": {
+        "type": "string",
+        "description": "The id of a Tulip Table query."
+      }
+    },
+    "required": ["tableId", "queryId"]
+  },
+  "category": "admin",
+  "type": "table",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/tables/:tableId/query/:queryId",
+  "includePathParamsInBody": true
+}

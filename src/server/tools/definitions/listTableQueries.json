@@ -1,0 +1,19 @@
+{
+  "name": "listTableQueries",
+  "description": "Lists queries for a Tulip Table. Corresponds to GET /tables/{tableId}/queries. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      }
+    },
+    "required": ["tableId"]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/queries"
+}

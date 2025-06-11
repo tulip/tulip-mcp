@@ -1,0 +1,31 @@
+{
+  "name": "linkTableRecords",
+  "description": "Links two records given a table link relationship. Corresponds to PUT /tableLinks/{tableLinkId}/link. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableLinkId": {
+        "type": "string",
+        "description": "The ID of the table link"
+      },
+      "leftRecordId": {
+        "type": "string",
+        "description": "ID of the left record to link"
+      },
+      "rightRecordId": {
+        "type": "string",
+        "description": "ID of the right record to link"
+      }
+    },
+    "required": [
+      "tableLinkId",
+      "leftRecordId",
+      "rightRecordId"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/tableLinks/:tableLinkId/link"
+}

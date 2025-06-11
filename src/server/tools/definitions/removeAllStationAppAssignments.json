@@ -1,0 +1,19 @@
+{
+  "name": "removeAllStationAppAssignments",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Removes all app assignments for the given station. Corresponds to DELETE /api/stations/v1/stations/{stationId}/app-assignments. Requires `stations:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The id of the station to update."
+      }
+    },
+    "required": ["stationId"]
+  },
+  "category": "admin",
+  "type": "app",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/api/stations/v1/stations/:stationId/app-assignments"
+}

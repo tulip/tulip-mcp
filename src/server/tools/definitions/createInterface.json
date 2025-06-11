@@ -1,0 +1,21 @@
+{
+  "name": "createInterface",
+  "description": "Creates a new interface. Corresponds to POST /api/stations/v1/interfaces. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "interfaceData": {
+        "type": "object",
+        "description": "Interface data for creating new interface"
+      }
+    },
+    "required": [
+      "interfaceData"
+    ]
+  },
+  "category": "write",
+  "type": "interface",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/api/stations/v1/interfaces"
+}

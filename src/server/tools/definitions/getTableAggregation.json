@@ -1,0 +1,23 @@
+{
+  "name": "getTableAggregation",
+  "description": "Looks up a table aggregation for a Tulip Table by id. Corresponds to GET /tables/{tableId}/aggregation/{aggregationId}. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "aggregationId": {
+        "type": "string",
+        "description": "The id of a Tulip Table aggregation."
+      }
+    },
+    "required": ["tableId", "aggregationId"]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/aggregation/:aggregationId"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "getTableLink",
+  "description": "Fetches information about a table link. Corresponds to GET /tableLinks/{tableLinkId}. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableLinkId": {
+        "type": "string",
+        "description": "The ID of the table link"
+      }
+    },
+    "required": [
+      "tableLinkId"
+    ]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tableLinks/:tableLinkId"
+}

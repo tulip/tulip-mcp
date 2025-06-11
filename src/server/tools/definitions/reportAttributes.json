@@ -1,0 +1,21 @@
+{
+  "name": "reportAttributes",
+  "description": "Reports new values for machine attributes. Corresponds to POST /attributes/report. Requires `attributes:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "attributes": {
+        "type": "object",
+        "description": "Attribute values to report"
+      }
+    },
+    "required": [
+      "attributes"
+    ]
+  },
+  "category": "write",
+  "type": "machine",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/attributes/report"
+}

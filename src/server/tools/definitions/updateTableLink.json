@@ -1,0 +1,25 @@
+{
+  "name": "updateTableLinkLabels",
+  "description": "Updates column labels for a table link. Corresponds to PUT /tableLinks/{tableLinkId}. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "leftColumnLabel": {
+        "type": "object",
+        "description": "New label for the left column in the linking relationship"
+      },
+       "rightColumnLabel": {
+        "type": "string",
+        "description": "New label for the right column in the linking relationship"
+      }
+    },
+    "required": [
+      "tableLinkId"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/tableLinks/:tableLinkId"
+}

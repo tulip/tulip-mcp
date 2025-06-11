@@ -1,0 +1,14 @@
+{
+  "name": "listTables",
+  "description": "Retrieves a list of all Tulip Tables. Corresponds to GET /tables. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables"
+}

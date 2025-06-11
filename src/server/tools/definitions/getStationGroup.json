@@ -1,0 +1,21 @@
+{
+  "name": "getStationGroup",
+  "description": "Gets details about a specific station group. Corresponds to GET /api/stations/v1/station-groups/{stationGroupId}. Requires `stations:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationGroupId": {
+        "type": "string",
+        "description": "The ID of the station group to retrieve"
+      }
+    },
+    "required": [
+      "stationGroupId"
+    ]
+  },
+  "category": "read-only",
+  "type": "station-group",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/stations/v1/station-groups/:stationGroupId"
+}

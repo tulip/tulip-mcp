@@ -1,0 +1,21 @@
+{
+  "name": "listStationAppAssignments",
+  "description": "Gets app assignments for a station. Corresponds to GET /api/stations/v1/stations/{stationId}/app-assignments. Requires `stations:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station"
+      }
+    },
+    "required": [
+      "stationId"
+    ]
+  },
+  "category": "read-only",
+  "type": "station",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/stations/v1/stations/:stationId/app-assignments"
+}

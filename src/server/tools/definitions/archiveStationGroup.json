@@ -1,0 +1,21 @@
+{
+  "name": "archiveStationGroup",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Archives a station group. This permanently removes the station group from active use. Corresponds to POST /api/stations/v1/station-groups/{stationGroupId}/archive. Requires `stations:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationGroupId": {
+        "type": "string",
+        "description": "The ID of the station group to archive"
+      }
+    },
+    "required": [
+      "stationGroupId"
+    ]
+  },
+  "category": "admin",
+  "type": "station-group",
+  "dangerous": true,
+  "httpType": "POST",
+  "url": "/api/stations/v1/station-groups/:stationGroupId/archive"
+}

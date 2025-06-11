@@ -1,0 +1,21 @@
+{
+  "name": "generateMachineActivityArchive",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Generates a machine activity archive for a given machine ID. This creates server load and should be used sparingly. Corresponds to POST /machines/archive/{machineID}. Requires the `machines:write` API key scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "machineId": {
+        "type": "string",
+        "description": "The ID of the machine to generate archive for"
+      }
+    },
+    "required": [
+      "machineId"
+    ]
+  },
+  "category": "admin",
+  "type": "machine",
+  "dangerous": true,
+  "httpType": "POST",
+  "url": "/machines/archive/:machineId"
+}

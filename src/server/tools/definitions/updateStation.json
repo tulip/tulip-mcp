@@ -1,0 +1,26 @@
+{
+  "name": "updateStation",
+  "description": "Updates a station. Corresponds to PATCH /api/stations/v1/stations/{stationId}. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station to update"
+      },
+      "stationData": {
+        "type": "object",
+        "description": "Updated station data"
+      }
+    },
+    "required": [
+      "stationId",
+      "stationData"
+    ]
+  },
+  "category": "write",
+  "type": "station",
+  "dangerous": false,
+  "httpType": "PATCH",
+  "url": "/api/stations/v1/stations/:stationId"
+}

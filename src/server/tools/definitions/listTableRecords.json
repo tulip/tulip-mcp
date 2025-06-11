@@ -1,0 +1,29 @@
+{
+  "name": "listTableRecords",
+  "description": "Lists records of a Tulip Table. Corresponds to GET /tables/{tableId}/records. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table to list records from"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of records to return"
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Number of records to skip"
+      }
+    },
+    "required": [
+      "tableId"
+    ]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/records"
+}

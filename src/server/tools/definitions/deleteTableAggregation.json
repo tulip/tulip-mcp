@@ -1,0 +1,23 @@
+{
+  "name": "deleteTableAggregation",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Removes a Tulip Table aggregation by id. Corresponds to DELETE /tables/{tableId}/aggregation/{aggregationId}. Requires `tables:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "aggregationId": {
+        "type": "string",
+        "description": "The id of a Tulip Table aggregation."
+      }
+    },
+    "required": ["tableId", "aggregationId"]
+  },
+  "category": "admin",
+  "type": "table",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/tables/:tableId/aggregation/:aggregationId"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "updateInterface",
+  "description": "Updates an interface. Corresponds to PATCH /api/stations/v1/interfaces/{interfaceId}. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "interfaceId": {
+        "type": "string",
+        "description": "The ID of the interface to update"
+      },
+      "interfaceData": {
+        "type": "object",
+        "description": "Updated interface data"
+      }
+    },
+    "required": [
+      "interfaceId",
+      "interfaceData"
+    ]
+  },
+  "category": "write",
+  "type": "interface",
+  "dangerous": false,
+  "httpType": "PATCH",
+  "url": "/api/stations/v1/interfaces/:interfaceId"
+}

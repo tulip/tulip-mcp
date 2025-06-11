@@ -1,0 +1,14 @@
+{
+  "name": "listUsers",
+  "description": "Gets a list of users. Corresponds to GET /api/users/v1/users. Requires `users:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "category": "read-only",
+  "type": "user",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/users/v1/users"
+}

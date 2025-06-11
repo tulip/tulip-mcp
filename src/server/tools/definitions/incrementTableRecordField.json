@@ -1,0 +1,36 @@
+{
+  "name": "incrementTableRecordField",
+  "description": "Increments/decrements a field in a table record. Corresponds to PATCH /tables/{tableId}/records/{recordId}/increment. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table"
+      },
+      "recordId": {
+        "type": "string",
+        "description": "The ID of the record"
+      },
+      "field": {
+        "type": "string",
+        "description": "Field name to increment"
+      },
+      "incrementValue": {
+        "type": "number",
+        "description": "Value to increment by (can be negative)"
+      }
+    },
+    "required": [
+      "tableId",
+      "recordId",
+      "field",
+      "incrementValue"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PATCH",
+  "url": "/tables/:tableId/records/:recordId/increment"
+}

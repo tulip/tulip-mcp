@@ -1,0 +1,21 @@
+{
+  "name": "createTableLink",
+  "description": "Creates a table link relationship. Corresponds to POST /tableLinks. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "linkData": {
+        "type": "object",
+        "description": "Table link relationship data"
+      }
+    },
+    "required": [
+      "linkData"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/tableLinks"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "createUser",
+  "description": "Creates a new Tulip User with specified role. This creates actual user accounts in your Tulip instance. Use with extreme caution. Corresponds to POST /users. Requires `users:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "role": {
+        "type": "string",
+        "description": "The role to assign to the user"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the user"
+      },
+      "badge_id": {
+        "type": "string",
+        "description": "Badge ID for the user"
+      }
+    },
+    "required": [
+      "role",
+      "name",
+      "badge_id"
+    ]
+  },
+  "category": "admin",
+  "type": "user",
+  "dangerous": true,
+  "httpType": "POST",
+  "url": "/users"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "listAppGroups",
+  "description": "Retrieves a list of all Tulip App Groups and their containing apps. Corresponds to GET /appGroups. Requires the `apps:read` API key scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "category": "read-only",
+  "type": "app",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/appGroups"
+}

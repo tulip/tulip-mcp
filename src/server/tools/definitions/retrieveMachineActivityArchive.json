@@ -1,0 +1,21 @@
+{
+  "name": "retrieveMachineActivityArchive",
+  "description": "Retrieves machine activity archive status. Corresponds to GET /machines/archive/csv/{jobID}. Requires `machines:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "jobId": {
+        "type": "string",
+        "description": "The job ID of the archive to retrieve"
+      }
+    },
+    "required": [
+      "jobId"
+    ]
+  },
+  "category": "read-only",
+  "type": "machine",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/machines/archive/csv/:jobId"
+}

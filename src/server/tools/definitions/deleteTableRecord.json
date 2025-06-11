@@ -1,0 +1,26 @@
+{
+  "name": "deleteTableRecord",
+  "description": "[DANGEROUS OPERATION] Deletes a specific record from a Tulip Table permanently. This action cannot be undone. Corresponds to DELETE /tables/{tableId}/records/{recordId}. Requires `tables:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table"
+      },
+      "recordId": {
+        "type": "string",
+        "description": "The ID of the record to delete"
+      }
+    },
+    "required": [
+      "tableId",
+      "recordId"
+    ]
+  },
+  "category": "admin",
+  "type": "table",
+  "dangerous": true,
+  "httpType": "DELETE",
+  "url": "/tables/:tableId/records/:recordId"
+}

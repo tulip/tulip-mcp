@@ -1,0 +1,21 @@
+{
+  "name": "archiveInterface",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Archives an interface. This permanently removes the interface from active use. Corresponds to POST /api/stations/v1/interfaces/{interfaceId}/archive. Requires `stations:write` scope. [ADMIN]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "interfaceId": {
+        "type": "string",
+        "description": "The ID of the interface to archive"
+      }
+    },
+    "required": [
+      "interfaceId"
+    ]
+  },
+  "category": "admin",
+  "type": "interface",
+  "dangerous": true,
+  "httpType": "POST",
+  "url": "/api/stations/v1/interfaces/:interfaceId/archive"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "listMachineTypes",
+  "description": "Retrieves a list of all Tulip machine types and their corresponding machines. Corresponds to GET /machines. Requires the `machines:read` API key scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "category": "read-only",
+  "type": "machine",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/machines"
+}

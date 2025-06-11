@@ -1,0 +1,21 @@
+{
+  "name": "getStation",
+  "description": "Gets details about a specific station. Corresponds to GET /api/stations/v1/stations/{stationId}. Requires `stations:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station to retrieve"
+      }
+    },
+    "required": [
+      "stationId"
+    ]
+  },
+  "category": "read-only",
+  "type": "station",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/stations/v1/stations/:stationId"
+}

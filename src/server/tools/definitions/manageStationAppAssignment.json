@@ -1,0 +1,43 @@
+{
+  "name": "manageStationAppAssignment",
+  "description": "Updates a specific app assignment for a station. Corresponds to PUT /api/stations/v1/stations/{stationId}/app-assignments/{appAssignmentId}. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "stationId": {
+        "type": "string",
+        "description": "The id of the station to update."
+      },
+      "appAssignmentId": {
+        "type": "string",
+        "description": "The id of the app assignment to update."
+      },
+      "type": {
+        "type": "string",
+        "description": "The type of app assignment"
+      },
+      "tag": {
+        "type": "string",
+        "description": "The tag of an app assignment. Determines if the app assignment refers to the development version of an app or the latest production version."
+      },
+      "appFolderId": {
+        "type": "string",
+        "description": "The ID of the app folder"
+      },
+      "appId": {
+        "type": "string",
+        "description": "The ID of the app"
+      },
+      "appVersionId": {
+        "type": "string",
+        "description": "The ID of the app version"
+      }
+    },
+    "required": ["stationId", "appAssignmentId", "type", "tag"]
+  },
+  "category": "write",
+  "type": "app",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/api/stations/v1/stations/:stationId/app-assignments/:appAssignmentId"
+}

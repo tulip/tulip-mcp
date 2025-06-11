@@ -1,0 +1,23 @@
+{
+  "name": "getTableQuery",
+  "description": "Looks up a table query for a Tulip Table by id. Corresponds to GET /tables/{tableId}/query/{queryId}. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "queryId": {
+        "type": "string",
+        "description": "The id of a Tulip Table query."
+      }
+    },
+    "required": ["tableId", "queryId"]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/query/:queryId"
+}

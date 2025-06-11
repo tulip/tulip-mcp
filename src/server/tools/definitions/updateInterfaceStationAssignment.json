@@ -1,0 +1,27 @@
+{
+  "name": "updateInterfaceStationAssignment",
+  "description": "Updates which station this interface is assigned to. Corresponds to PUT /api/stations/v1/interfaces/{interfaceId}/station-assignment. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "interfaceId": {
+        "type": "string",
+        "description": "The unique identifier for an interface."
+      },
+      "replaceInterfaceAtStation": {
+        "type": "boolean",
+        "description": "If set to true, indicates that if there is already an interface assigned to the station it will be replaced."
+      },
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station to assign the interface to"
+      }
+    },
+    "required": ["interfaceId"]
+  },
+  "category": "write",
+  "type": "interface",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/api/stations/v1/interfaces/:interfaceId/station-assignment"
+}

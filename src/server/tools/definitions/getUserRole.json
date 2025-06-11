@@ -1,0 +1,21 @@
+{
+  "name": "getUserRole",
+  "description": "Gets details about a specific user role. Corresponds to GET /api/users/v1/roles/{userRoleId}. Requires `users:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "userRoleId": {
+        "type": "string",
+        "description": "The ID of the user role to retrieve"
+      }
+    },
+    "required": [
+      "userRoleId"
+    ]
+  },
+  "category": "read-only",
+  "type": "user",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/users/v1/roles/:userRoleId"
+}

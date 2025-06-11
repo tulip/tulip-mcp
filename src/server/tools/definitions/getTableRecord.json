@@ -1,0 +1,26 @@
+{
+  "name": "getTableRecord",
+  "description": "Gets a specific record from a Tulip Table. Corresponds to GET /tables/{tableId}/records/{recordId}. Requires `tables:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table"
+      },
+      "recordId": {
+        "type": "string",
+        "description": "The ID of the record to retrieve"
+      }
+    },
+    "required": [
+      "tableId",
+      "recordId"
+    ]
+  },
+  "category": "read-only",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/tables/:tableId/records/:recordId"
+}

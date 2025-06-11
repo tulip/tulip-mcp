@@ -1,0 +1,26 @@
+{
+  "name": "createTableRecord",
+  "description": "Creates a new record in a Tulip Table. Corresponds to POST /tables/{tableId}/records. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the table to create record in"
+      },
+      "recordData": {
+        "type": "object",
+        "description": "Record data to create"
+      }
+    },
+    "required": [
+      "tableId",
+      "recordData"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/tables/:tableId/records"
+}

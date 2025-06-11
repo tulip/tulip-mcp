@@ -1,0 +1,35 @@
+{
+  "name": "updateTableAggregation",
+  "description": "Updates an aggregation in a Tulip Table by the aggregation id. Corresponds to PUT /tables/{tableId}/aggregation/{aggregationId}. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "aggregationId": {
+        "type": "string",
+        "description": "The id of a Tulip Table aggregation."
+      },
+      "field": {
+        "type": "string",
+        "description": "The field to aggregate on"
+      },
+      "fn": {
+        "type": "string",
+        "description": "The aggregation function to apply"
+      },
+      "label": {
+        "type": "string",
+        "description": "The label for the aggregation"
+      }
+    },
+    "required": ["tableId", "aggregationId", "field", "fn", "label"]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "PUT",
+  "url": "/tables/:tableId/aggregation/:aggregationId"
+}

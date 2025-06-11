@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "tulip-mcp": {
+      "command": "node",
+      "args": ["C:/<PATH_TO_TULIP_MCP>/tulip-mcp/src/index.js"]
+    }
+  }
+} 

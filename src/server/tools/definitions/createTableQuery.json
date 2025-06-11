@@ -1,0 +1,86 @@
+{
+  "name": "createTableQuery",
+  "description": "Create a Tulip Table Query in specified Table. Corresponds to POST /tables/{tableId}/queries. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The ID of the Tulip Table that the query is being created on."
+      },
+      "label": {
+        "type": "string",
+        "description": "The display label for the query."
+      },
+      "filters": {
+        "type": "array",
+        "description": "An array of filter objects that define the conditions for the query. Each filter object should contain a field, functionType, and value.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string",
+              "description": "The internal ID for the filter"
+            },
+            "field": {
+              "type": "string",
+              "description": "The field to filter on"
+            },
+            "functionType": {
+              "type": "string",
+              "description": "The function type for the filter"
+            },
+            "value": {
+              "type": "object",
+              "properties": {
+                "datasourceType": {
+                  "type": "string",
+                  "description": "app-info or static. if static than params is required."
+                },
+                "params": {
+                  "type": ["string", "number", "boolean"],
+                  "description": "The actual value to compare against the field."
+                }
+              }
+            }
+          },
+          "required": ["field", "functionType", "_id"]
+        }
+      },
+    
+      "filterAggregator": {
+        "type": "string",
+        "description": "The aggregator of all filters defined on the query."
+      },
+      "sortOptions": {
+        "type": "array",
+        "description": "An array of sort options that define how the records should be sorted. Each sort option should contain a field and direction.",
+        "items": {
+          "type": "object",
+          "properties": {
+           "sortBy": {
+              "type": "string",
+              "description": "The field that records should be sorted by in the response. Can be the name of any of the columns of the Table (including id) or one of these special values:"
+            },
+            "sortDir": {
+              "type": "string",
+              "description": "The direction of the records, asc or desc"
+            }
+          },
+          "required": ["sortBy", "sortDir"]
+        }
+      },
+      "limit": {
+        "type": "integer",
+        "description": "The number of records that the query returns."
+      }
+    },
+    "required": ["tableId", "label", "filters", "filterAggregator", "sortOptions", "limit"]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/tables/:tableId/queries",
+  "includePathParamsInBody": true
+}

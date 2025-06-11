@@ -1,0 +1,31 @@
+{
+  "name": "createTableAggregation",
+  "description": "Creates a new Tulip Table aggregation in the specified Table. Corresponds to POST /tables/{tableId}/aggregations. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableId": {
+        "type": "string",
+        "description": "The id of a Tulip Table."
+      },
+      "field": {
+        "type": "string",
+        "description": "The field to aggregate on"
+      },
+      "fn": {
+        "type": "string",
+        "description": "The aggregation function to apply"
+      },
+      "label": {
+        "type": "string",
+        "description": "The label for the aggregation"
+      }
+    },
+    "required": ["tableId", "field", "fn", "label"]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/tables/:tableId/aggregations"
+}

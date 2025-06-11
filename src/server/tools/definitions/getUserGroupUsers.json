@@ -1,0 +1,21 @@
+{
+  "name": "getUserGroupUsers",
+  "description": "Gets users in a specific user group. Corresponds to GET /api/users/v1/user-groups/{userGroupId}/users. Requires `users:read` scope. [READ-ONLY]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "userGroupId": {
+        "type": "string",
+        "description": "The ID of the user group"
+      }
+    },
+    "required": [
+      "userGroupId"
+    ]
+  },
+  "category": "read-only",
+  "type": "user",
+  "dangerous": false,
+  "httpType": "GET",
+  "url": "/api/users/v1/user-groups/:userGroupId/users"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "createTable",
+  "description": "Creates a new Tulip Table. Corresponds to POST /tables. Requires `tables:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "tableData": {
+        "type": "object",
+        "description": "Table data for creating new table"
+      }
+    },
+    "required": [
+      "tableData"
+    ]
+  },
+  "category": "write",
+  "type": "table",
+  "dangerous": false,
+  "httpType": "POST",
+  "url": "/tables"
+}
