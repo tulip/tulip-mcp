@@ -38,8 +38,8 @@
                   "description": "app-info or static. if static than params is required."
                 },
                 "params": {
-                  "type": ["string", "number", "boolean"],
-                  "description": "The actual value to compare against the field."
+                  "type": "object",
+                  "description": "The actual value to compare against the field. Can be a string, number, or boolean."
                 }
               }
             }

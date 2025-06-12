@@ -6,13 +6,13 @@ and more.
 
 ## Features
 
-This MCP server provides **61 Tulip API tools** organized across multiple API namespaces:
+This MCP server provides **71 Tulip API tools** organized across multiple categories:
 
-- **📱 Stations & Interfaces** (28 tools) - Station management, interface assignments, app configurations
+- **📱 Stations & Interfaces** (24 tools) - Station management, interface assignments, app configurations
 - **👥 Users & Access Control** (9 tools) - User management, roles, groups, permissions
-- **📊 Tables & Records** (18 tools) - Data tables, records, queries, aggregations, links
+- **📊 Tables & Records** (28 tools) - Data tables, records, queries, aggregations, links
 - **🏭 Machines** (4 tools) - Machine monitoring, attributes, activity archives
-- **📱 Apps & Content** (1 tool) - App group management
+- **📱 Apps & Content** (5 tools) - App group management
 - **🔧 Utilities** (1 tool) - URL signing and cloud storage
 
 > 📚 **For detailed tool documentation, parameters, and examples, see [tools.md](tools.md)**
@@ -111,16 +111,16 @@ ENABLED_TOOLS=read-only,write,admin
 
 #### Available Categories
 
-- **`read-only`**: Safe operations that only read data (24 tools)
-- **`write`**: Operations that create or modify data (23 tools)
-- **`admin`**: Dangerous operations like deletions and archiving (14 tools)
+- **`read-only`**: Safe operations that only read data (30 tools)
+- **`write`**: Operations that create or modify data (28 tools)
+- **`admin`**: Dangerous operations like deletions and archiving (13 tools)
 
 #### Available Types
 
-- **`table`**: Table and record operations (18 tools)
+- **`table`**: Table and record operations (28 tools)
 - **`machine`**: Machine-related operations (4 tools)
 - **`user`**: User management operations (9 tools)
-- **`app`**: App group operations (1 tool)
+- **`app`**: App group operations (5 tools)
 - **`interface`**: Interface management operations (7 tools)
 - **`station`**: Station management operations (9 tools)
 - **`station-group`**: Station group management operations (9 tools)

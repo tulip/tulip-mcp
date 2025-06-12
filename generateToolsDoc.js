@@ -279,7 +279,7 @@ function writeToolsDoc() {
 }
 
 // Run the script
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (path.resolve(fileURLToPath(import.meta.url)) === path.resolve(process.argv[1])) {
   writeToolsDoc();
 }
 

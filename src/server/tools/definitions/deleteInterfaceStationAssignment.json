@@ -1,0 +1,14 @@
+{
+  "name": "deleteInterfaceStationAssignment",
+  "description": "Unassigns an interface from a station by deleting its station assignment. Corresponds to DELETE /api/stations/v1/interfaces/{interfaceId}/station-assignment. Requires `stations:write` scope. [WRITE]",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "category": "write",
+  "type": "interface",
+  "dangerous": false,
+  "httpType": "DELETE",
+  "url": "/api/stations/v1/interfaces/:interfaceId/station-assignment"
+}

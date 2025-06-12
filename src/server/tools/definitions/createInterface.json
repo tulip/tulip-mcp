@@ -4,13 +4,22 @@
   "inputSchema": {
     "type": "object",
     "properties": {
-      "interfaceData": {
-        "type": "object",
-        "description": "Interface data for creating new interface"
+      "name": {
+        "type": "string",
+        "description": "Name of the interface"
+      },
+      "stationId": {
+        "type": "string",
+        "description": "The ID of the station to assign the interface to"
+      },
+      "replaceInterfaceAtStation": {
+        "type": "boolean",
+        "description": "If set to true, indicates that if there is already an interface at the station it will be replaced"
       }
     },
     "required": [
-      "interfaceData"
+      "name",
+      "stationId"
     ]
   },
   "category": "write",

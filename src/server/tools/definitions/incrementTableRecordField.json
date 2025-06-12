@@ -12,20 +12,20 @@
         "type": "string",
         "description": "The ID of the record"
       },
-      "field": {
+      "fieldName": {
         "type": "string",
-        "description": "Field name to increment"
+        "description": "The field (column) to increment or decrement."
       },
-      "incrementValue": {
+      "value": {
         "type": "number",
-        "description": "Value to increment by (can be negative)"
+        "description": "The amount to increment or decrement, can be positive or negative"
       }
     },
     "required": [
       "tableId",
       "recordId",
-      "field",
-      "incrementValue"
+      "fieldName",
+      "value"
     ]
   },
   "category": "write",

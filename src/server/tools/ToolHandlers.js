@@ -124,8 +124,8 @@ export class ToolHandlers {
 
         case 'incrementTableRecordField':
           const incrementData = {
-            field: args.field,
-            incrementValue: args.incrementValue
+            fieldName: args.fieldName,
+            value: args.value
           };
           result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records/${args.recordId}/increment`, 'PATCH', incrementData);
           break;
@@ -138,7 +138,7 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}`);
           break;
 
-        case 'updateTableLink':
+        case 'updateTableLinkLabels':
            const updateTableLinkData = {
             leftColumnLabel: args.leftColumnLabel,
             rightColumnLabel: args.rightColumnLabel
@@ -147,16 +147,16 @@ export class ToolHandlers {
           break;
         case 'linkTableRecords':
           const linkData = {
-            leftRecordId: args.leftRecordId,
-            rightRecordId: args.rightRecordId
+            leftRecord: args.leftRecord,
+            rightRecord: args.rightRecord
           };
           result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}/link`, 'PUT', linkData);
           break;
 
         case 'unlinkTableRecords':
           const unlinkData = {
-            leftRecordId: args.leftRecordId,
-            rightRecordId: args.rightRecordId
+            leftRecord: args.leftRecord,
+            rightRecord: args.rightRecord
           };
           result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}/unlink`, 'PUT', unlinkData);
           break;
@@ -254,7 +254,15 @@ export class ToolHandlers {
           break;
 
         case 'createInterface':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/interfaces'), 'POST', args.interfaceData);
+          const createInterfaceBody = {
+            name: args.name,
+            stationId: args.stationId,
+          };
+          const createInterfaceQuery = {};
+          if (args.replaceInterfaceAtStation !== undefined) {
+            createInterfaceQuery.replaceInterfaceAtStation = args.replaceInterfaceAtStation;
+          }
+          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/interfaces'), 'POST', createInterfaceBody, createInterfaceQuery);
           break;
 
         case 'getInterface':
@@ -269,12 +277,7 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/archive`), 'POST');
           break;
 
-        case 'assignInterfaceToStation':
-          const assignmentData = { stationId: args.stationId };
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'PUT', assignmentData);
-          break;
-
-        case 'removeInterfaceStationAssignment':
+        case 'deleteInterfaceStationAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'DELETE');
           break;
 
@@ -359,10 +362,6 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments`), 'POST', args.appAssignmentData);
           break;
 
-        case 'updateStationAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'PUT', args.appAssignmentData);
-          break;
-
         case 'deleteStationAppAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'DELETE');
           break;
@@ -392,10 +391,6 @@ export class ToolHandlers {
 
         case 'createStationGroupAppAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments`), 'POST', args.appAssignmentData);
-          break;
-
-        case 'updateStationGroupAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments/${args.appAssignmentId}`), 'PUT', args.appAssignmentData);
           break;
 
         case 'deleteStationGroupAppAssignment':
@@ -447,10 +442,6 @@ export class ToolHandlers {
 
         case 'getUser':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}`));
-          break;
-
-        case 'getUserGroups':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}/user-groups`));
           break;
 
         case 'listUserUserGroups':

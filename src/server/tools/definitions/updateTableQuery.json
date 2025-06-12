@@ -4,6 +4,10 @@
   "inputSchema": {
     "type": "object",
     "properties": {
+      "queryId": {
+        "type": "string",
+        "description": "The ID of the query to update."
+      },
       "tableId": {
         "type": "string",
         "description": "The ID of the Tulip Table that the query is being created on."
@@ -32,19 +36,10 @@
             },
             "value": {
               "type": "object",
-              "properties": {
-                "datasourceType": {
-                  "type": "string",
-                  "description": "app-info or static. if static than params is required."
-                },
-                "params": {
-                  "type": ["string", "number", "boolean"],
-                  "description": "The actual value to compare against the field."
-                }
-              }
+              "description": "The actual value to compare against the field."
             }
           },
-          "required": ["field", "functionType", "_id"]
+          "required": ["field", "functionType", "value", "_id"]
         }
       },
     
@@ -75,7 +70,7 @@
         "description": "The number of records that the query returns."
       }
     },
-    "required": ["tableId", "label", "filters", "filterAggregator", "sortOptions", "limit"]
+    "required": ["tableId", "queryId", "label", "filters", "filterAggregator", "sortOptions", "limit"]
   },
   "category": "write",
   "type": "table",

@@ -8,19 +8,19 @@
         "type": "string",
         "description": "The ID of the table link"
       },
-      "leftRecordId": {
+      "leftRecord": {
         "type": "string",
         "description": "ID of the left record to link"
       },
-      "rightRecordId": {
+      "rightRecord": {
         "type": "string",
         "description": "ID of the right record to link"
       }
     },
     "required": [
       "tableLinkId",
-      "leftRecordId",
-      "rightRecordId"
+      "leftRecord",
+      "rightRecord"
     ]
   },
   "category": "write",
