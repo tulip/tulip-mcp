@@ -138,7 +138,7 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}`);
           break;
 
-        case 'updateTableLink':
+        case 'updateTableLinkLabels':
            const updateTableLinkData = {
             leftColumnLabel: args.leftColumnLabel,
             rightColumnLabel: args.rightColumnLabel
@@ -269,12 +269,7 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/archive`), 'POST');
           break;
 
-        case 'assignInterfaceToStation':
-          const assignmentData = { stationId: args.stationId };
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'PUT', assignmentData);
-          break;
-
-        case 'removeInterfaceStationAssignment':
+        case 'deleteInterfaceStationAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'DELETE');
           break;
 
@@ -359,10 +354,6 @@ export class ToolHandlers {
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments`), 'POST', args.appAssignmentData);
           break;
 
-        case 'updateStationAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'PUT', args.appAssignmentData);
-          break;
-
         case 'deleteStationAppAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'DELETE');
           break;
@@ -392,10 +383,6 @@ export class ToolHandlers {
 
         case 'createStationGroupAppAssignment':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments`), 'POST', args.appAssignmentData);
-          break;
-
-        case 'updateStationGroupAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments/${args.appAssignmentId}`), 'PUT', args.appAssignmentData);
           break;
 
         case 'deleteStationGroupAppAssignment':
@@ -447,10 +434,6 @@ export class ToolHandlers {
 
         case 'getUser':
           result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}`));
-          break;
-
-        case 'getUserGroups':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}/user-groups`));
           break;
 
         case 'listUserUserGroups':

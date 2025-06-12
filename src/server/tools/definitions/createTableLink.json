@@ -6,7 +6,34 @@
     "properties": {
       "linkData": {
         "type": "object",
-        "description": "Table link relationship data"
+        "description": "Table link relationship data",
+        "properties": {
+          "leftTableId": {
+            "type": "string",
+            "description": "ID of the left table in the relationship"
+          },
+          "rightTableId": {
+            "type": "string",
+            "description": "ID of the right table in the relationship"
+          },
+          "relationshipType": {
+            "type": "string",
+            "description": "The type of relationship (e.g., one-to-one, one-to-many, many-to-many)"
+          },
+          "leftColumnLabel": {
+            "type": "string",
+            "description": "A label for the column in the left table"
+          },
+          "rightColumnLabel": {
+            "type": "string",
+            "description": "A label for the column in the right table"
+          }
+        },
+        "required": [
+          "leftTableId",
+          "rightTableId",
+          "relationshipType"
+        ]
       }
     },
     "required": [

@@ -4,8 +4,12 @@
   "inputSchema": {
     "type": "object",
     "properties": {
+      "tableLinkId": {
+        "type": "string",
+        "description": "ID of the table link to update"
+      },
       "leftColumnLabel": {
-        "type": "object",
+        "type": "string",
         "description": "New label for the left column in the linking relationship"
       },
        "rightColumnLabel": {
