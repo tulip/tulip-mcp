@@ -17,51 +17,133 @@ This MCP server provides **71 Tulip API tools** organized across multiple catego
 
 > 📚 **For detailed tool documentation, parameters, and examples, see [tools.md](tools.md)**
 
-## Setup
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18 or higher
-- A Tulip instance with API access
+- A Tulip instance
 - Tulip API credentials (API key and secret)
 
 ### Installation
 
-1. Clone this repository:
+- **Node.js**: This is a JavaScript runtime that lets you run the server.
+  - **Download Node.js**: [Click here to download Node.js (LTS version recommended)](https://nodejs.org/en/download/)
+- **Git**: This is a version control system used to download the server code.
+  - **Download Git**: [Click here to download Git](https://git-scm.com/downloads)
 
-```bash
-git clone https://github.com/tulip-ecosystem/tulip-mcp
-cd tulip-mcp
-```
+Install both of these with the default options. You may need to restart your computer after installation.
 
-2. Install dependencies:
+---
 
-```bash
-npm install
-```
+### 2. Setup Instructions
 
-3. Create a `.env` file based on `env.example`:
+Follow the instructions for your operating system.
 
-```bash
-cp env.example .env
-```
+<details>
+<summary><b>Windows</b></summary>
 
-4. Edit the `.env` file with your Tulip API credentials:
+1.  **Open Command Prompt:**
+    -   Press the `Windows Key`, type `cmd`, and press `Enter`.
 
-```env
-TULIP_API_KEY=your_tulip_api_key_here
-TULIP_API_SECRET=your_tulip_api_secret_here
-TULIP_BASE_URL=https://your-instance.tulip.co
-TULIP_WORKSPACE_ID=your_workspace_id_here
-MCP_SERVER_NAME=tulip-mcp
-MCP_SERVER_VERSION=1.0.0
-```
+2.  **Navigate to Your Chosen Folder:**
+    -   Choose a folder where you want to store the server and navigate into it. Replace `path\to\your\folder` with your actual folder path:
+        ```cmd
+        cd path\to\your\folder
+        ```
 
-### Getting Tulip API Credentials
+3.  **Download the Server Code:**
+    -   Copy and paste the following command and press `Enter`:
+        ```cmd
+        git clone https://github.com/tulip-ecosystem/tulip-mcp.git
+        ```
 
-1. Log in to your Tulip instance
-2. Navigate to Settings > API Tokens
-3. Create a new API token with the appropriate scopes:
+4.  **Enter the Server Directory:**
+    -   Type the following command and press `Enter`:
+        ```cmd
+        cd tulip-mcp
+        ```
+
+5.  **Install Dependencies:**
+    -   This command downloads the necessary libraries for the server. Type the following and press `Enter`:
+        ```cmd
+        npm install
+        ```
+
+6.  **Create the Configuration File:**
+    -   Copy the example configuration file. Type the following and press `Enter`:
+        ```cmd
+        copy env.example .env
+        ```
+
+</details>
+
+<details>
+<summary><b>macOS & Linux</b></summary>
+
+1.  **Open Terminal:**
+    -   **macOS**: Open `Finder`, go to `Applications` > `Utilities`, and open `Terminal`.
+    -   **Linux**: Usually `Ctrl+Alt+T` or find it in your applications menu.
+
+2.  **Navigate to Your Chosen Folder:**
+    -   Choose a folder where you want to store the server and navigate into it. Replace `path/to/your/folder` with your actual folder path:
+        ```bash
+        cd path/to/your/folder
+        ```
+
+3.  **Download the Server Code:**
+    -   Copy and paste the following command and press `Enter`:
+        ```bash
+        git clone https://github.com/tulip-ecosystem/tulip-mcp.git
+        ```
+
+4.  **Enter the Server Directory:**
+    -   Type the following command and press `Enter`:
+        ```bash
+        cd tulip-mcp
+        ```
+
+5.  **Install Dependencies:**
+    -   This command downloads the necessary libraries for the server. Type the following and press `Enter`:
+        ```bash
+        npm install
+        ```
+
+6.  **Create the Configuration File:**
+    -   Copy the example configuration file. Type the following and press `Enter`:
+        ```bash
+        cp env.example .env
+        ```
+
+</details>
+
+---
+
+### 3. Configure Your Credentials
+
+Now you need to add your Tulip API credentials to the server.
+
+1.  **Open the `.env` file:**
+    -   Navigate to the `tulip-mcp` folder (wherever you chose to download it).
+    -   You will see a file named `.env`. Open this file with a simple text editor (like Notepad on Windows or TextEdit on macOS).
+
+2.  **Edit the `.env` file:**
+    -   You will see the following lines:
+        ```env
+        TULIP_API_KEY=your_api_key_here
+        TULIP_API_SECRET=your_api_secret_here
+        TULIP_BASE_URL=https://your-instance.tulip.co
+        TULIP_WORKSPACE_ID=your_workspace_id_here_if_using_account_api_key
+        ```
+    -   Replace `your_api_key_here`, `your_api_secret_here`, and `https://your-instance.tulip.co` with your actual Tulip credentials.
+    -   See the section below on how to get these credentials.
+
+#### **How to Get Tulip API Credentials**
+
+1.  Log in to your Tulip instance.
+2.  Navigate to **Settings** > **API Tokens**.
+3.  Create a new API token. Give it a name (e.g., "MCP Server").
+4.  Make sure to grant it the necessary permissions (scopes):
    - `apps:read` - for app group operations
    - `machines:read`, `machines:write` - for machine operations
    - `attributes:write` - for attribute reporting
@@ -69,20 +151,75 @@ MCP_SERVER_VERSION=1.0.0
    - `stations:read`, `stations:write` - for stations/interfaces operations
    - `tables:read`, `tables:write` - for table operations
    - `urls:sign` - for URL signing
+5.  Copy the **API Key** and **Secret** and paste them into your `.env` file.
+6.  Your instance URL is the URL you use to access Tulip (e.g., `https://my-company.tulip.co`).
+7.  Your workspace ID is in your Tulip URL after `/w/`. For most users, this is `DEFAULT`.
 
-4. Copy the API key and secret to your `.env` file
-5. Find your workspace ID in your Tulip instance URL (your-instance.tulip.co/w/your-workspace-id) and add it to `TULIP_WORKSPACE_ID`
+⚠️ **Important**: The `TULIP_WORKSPACE_ID` is only required if you are using an Account API key (obtained from Account Settings). If you are using a Workspace API key (obtained from Workspace Settings), leave this field empty.
 
-⚠️ **Important**: The `TULIP_WORKSPACE_ID` is **required only for Account API keys**.
+---
 
-**API Key Types:**
+### 4. Running the Server
 
-- **Account API Keys**: Set `TULIP_WORKSPACE_ID` to your workspace ID - required for stations and interfaces APIs
-- **Workspace API Keys**: Leave `TULIP_WORKSPACE_ID` empty or unset - workspace context is automatic
+This server is designed to be run by an MCP-compatible client application (like an LLM agent or a chatbot). The client will start and stop the server 
+automatically over `stdio`.
+
+To connect the server, you need to configure your MCP client. Here is an example configuration:
+```json
+{
+  "mcpServers": {
+    "tulip-mcp": {
+      "command": "node",
+      "args": ["/path/to/your/tulip-mcp/src/index.js"]
+    }
+  }
+}
+```
+**Important:**
+- Replace `/path/to/your/tulip-mcp/src/index.js` with the **absolute path** to the `index.js` file on your computer.
+- **Windows users:** Make sure to use forward slashes (`/`) or double backslashes (`\\`) in your path (e.g., `C:/Users/YourUser/Documents/tulip-mcp/src/
+index.js`).
+
+<details>
+<summary><b>Guide: Claude Desktop</b></summary>
+
+[Claude Desktop](https://modelcontextprotocol.io/quickstart/user) can be extended with MCP servers.
+
+1.  From the Claude Desktop menu bar, select **Settings...** > **Developer** > **Edit Config**.
+2.  This will open the `claude_desktop_config.json` file.
+3.  Add the server configuration inside the `mcpServers` object as shown in the main example above.
+    -   *Note: If other servers are already listed, add a comma before the `"tulip-mcp": { ... }` entry.*
+    -   For Windows, ensure your path uses double backslashes (e.g., `C:\\Users\\YourUser\\Documents\\tulip-mcp\\src\\index.js`).
+4.  Save the file and **restart Claude Desktop**.
+
+> For more details, see the [official Claude Desktop MCP Quickstart](https://modelcontextprotocol.io/quickstart/user).
+
+</details>
+
+
+Once configured, your MCP client will run the server when it needs to. If you make any changes to your `.env` file, you must restart the server in your MCP Client for the changes to take effect.
+
+---
+
+## 🛠️ Developer Guide (Advanced)
+
+This section contains more advanced configuration for developers.
+
+### (Optional) Testing the Server
+
+If you want to test the server directly to ensure it is configured correctly, you can run it from your command line.
+
+Make sure you are in the `tulip-mcp` directory, then run:
+
+```bash
+npm start
+```
+
+The server will start and wait for a connection. You can stop it by pressing `Ctrl+C`.
 
 ### Tool Selection Configuration
 
-By default, the server enables only read-only tools for safety. You can customize which tools are available using the `ENABLED_TOOLS` environment variable.
+By default, the server enables only `read-only` tools and `table` tools for safety. You can customize which tools are available using the `ENABLED_TOOLS` environment variable in your `.env` file.
 
 The `ENABLED_TOOLS` variable accepts a comma-separated list that can include:
 
@@ -128,72 +265,17 @@ ENABLED_TOOLS=read-only,write,admin
 
 ⚠️ **Security Note**: Admin tools can permanently delete data or archive resources. Only enable them if you understand the risks.
 
-## Usage
-
-### Running the Server
-
-Start the MCP server:
-
-```bash
-npm start
-```
-
-For development with auto-restart:
-
-```bash
-npm run dev
-```
-
-### Using with MCP Clients
-
-This server implements the Model Context Protocol and can be used with any MCP-compatible client. The server communicates over stdio.
-
-#### Example MCP Client Configuration
-
-For clients that support MCP server configuration, you can add this server like:
-
-```json
-{
-  "mcpServers": {
-    "tulip-mcp": {
-      "command": "node",
-      "args": ["C:/path/to/tulip-mcp/src/index.js"]
-    }
-  }
-}
-```
-
-Or with environment variables inline:
-
-```json
-{
-  "mcpServers": {
-    "tulip-mcp": {
-      "command": "node",
-      "args": ["C:/path/to/tulip-mcp/src/index.js"],
-      "env": {
-        "TULIP_API_KEY": "your_api_key",
-        "TULIP_API_SECRET": "your_api_secret",
-        "TULIP_BASE_URL": "https://your-instance.tulip.co",
-        "TULIP_WORKSPACE_ID": "your_workspace_id",
-        "ENABLED_TOOLS": "read-only,write"
-      }
-    }
-  }
-}
-```
-
-## API Documentation
+### API Documentation
 
 For detailed tool documentation including:
 
-- Complete parameter lists and examples
+- Complete parameter lists and examples for each tool
 - API endpoints and HTTP methods
 - Required scopes and permissions
 - Usage examples and return values
 - Error handling and troubleshooting
 
-**👉 Generate the tools.md for comprehensive API documentation by running `npm run docs`**
+**👉 Generate `tools.md` for comprehensive API documentation by running `npm run docs`**
 
 ## API Scopes Required
 
@@ -216,4 +298,4 @@ stations:read,users:read,tables:read,machines:read,apps:read,urls:sign
 For detailed documentation, troubleshooting, and examples:
 
 - **Tool Reference**: See `tools.md`. This file can be generated by running `npm run docs`.
-- **Tulip Documentation**: Visit `https://support.tulip.co/api/apidocs`
+- **Tulip Documentation**: Visit `https://support.tulip.co/apidocs`
