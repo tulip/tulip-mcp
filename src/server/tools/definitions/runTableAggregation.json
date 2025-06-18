@@ -8,19 +8,68 @@
         "type": "string",
         "description": "The ID of the table"
       },
-      "aggregationType": {
+      "function": {
         "type": "string",
-        "description": "Type of aggregation (sum, avg, count, etc.)"
+        "description": "Aggregate function name. Valid values: [ \"sum\", \"count\", \"avg\", \"min\", \"max\", \"mode\", \"uniqueValues\" ]"
       },
-      "field": {
+      "fieldId": {
         "type": "string",
-        "description": "Field to aggregate on"
+        "description": "The field to aggregate on."
+      },
+      "limit": {
+        "type": "integer",
+        "description": "The maximum number of table records to evaluate. Minimum 1, Maximum 100000."
+      },
+      "sortOptions": {
+        "type": "array",
+        "description": "Sorting allows to define which records are considered if there are more than the specified limit. Sort priority is determined by the order or options. Example: [{\"sortBy\": \"field1\", \"sortDir\": \"asc\"}]",
+        "items": {
+          "type": "object",
+          "properties": {
+            "sortBy": {
+              "type": "string",
+              "description": "The field that records should be sorted by in the response."
+            },
+            "sortDir": {
+              "type": "string",
+              "description": "The direction of the records, 'asc' or 'desc'."
+            }
+          },
+          "required": ["sortBy", "sortDir"]
+        }
+      },
+      "filters": {
+        "type": "array",
+        "description": "An optional array of filter expressions to filter the Table records by. Example: [{\"field\": \"field1\", \"functionType\": \"equal\", \"arg\": \"value1\"}]",
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string",
+              "description": "The field to filter on."
+            },
+            "functionType": {
+              "type": "string",
+              "description": "The comparison function to use."
+            },
+            "arg": {
+              "type": "string",
+              "description": "The value to compare to. Not required for 'blank' or 'notBlank'."
+            }
+          },
+          "required": ["field", "functionType"]
+        }
+      },
+      "filterAggregator": {
+        "type": "string",
+        "description": "How to combine filters, 'all' or 'any'. Default is 'all'."
       }
     },
     "required": [
       "tableId",
-      "aggregationType",
-      "field"
+      "function",
+      "fieldId",
+      "limit"
     ]
   },
   "category": "read-only",
