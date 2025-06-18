@@ -116,9 +116,19 @@ export class ToolHandlers {
 
         case 'runTableAggregation':
           const aggQueryParams = {
-            aggregationType: args.aggregationType,
-            field: args.field
+            'function': args['function'],
+            fieldId: args.fieldId,
+            limit: args.limit,
           };
+          if (args.sortOptions) {
+            aggQueryParams.sortOptions = args.sortOptions;
+          }
+          if (args.filters) {
+            aggQueryParams.filters = args.filters;
+          }
+          if (args.filterAggregator) {
+            aggQueryParams.filterAggregator = args.filterAggregator;
+          }
           result = await this.apiClient.makeRequest(`/tables/${args.tableId}/runAggregation`, 'GET', null, aggQueryParams);
           break;
 
