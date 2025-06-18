@@ -31,7 +31,7 @@ This method lets you run the server without downloading any code. It's the faste
     Open your terminal or command prompt, navigate to the folder containing your `.env` file, and run:
 
     ```bash
-    npx tulip-mcp
+    npx @tulip/mcp-server
     ```
 
     The server will start and is now ready to be connected to an MCP client like Claude Desktop or Cursor.
@@ -172,7 +172,7 @@ Your client needs a command to run the server. Use one of the following setups:
     {
       "mcpServers": {
         "tulip-mcp": {
-          "command": "npx tulip-mcp"
+          "command": "npx @tulip/mcp-server"
         }
       }
     }
@@ -207,7 +207,7 @@ Your client needs a command to run the server. Use one of the following setups:
 
 For the easiest setup, click the button below. This will configure Cursor to run the server using `npx`. No path configuration is needed.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=tulip-mcp&config=eyJjb21tYW5kIjogIm5weCB0dWxpcC1tY3AifQ==)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=tulip-mcp&config=eyJjb21tYW5kIjoibnB4IEB0dWxpcC9tY3Atc2VydmVyIn0%3D)
 
 If you installed manually and need to specify a path, click the button and then **edit the `Command` field** in the dialog to provide the correct absolute path to the `index.js` file inside your downloaded `tulip-mcp` folder.
 
