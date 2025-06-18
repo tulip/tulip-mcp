@@ -195,6 +195,16 @@ index.js`).
 > For more details, see the [official Claude Desktop MCP Quickstart](https://modelcontextprotocol.io/quickstart/user).
 
 </details>
+<details>
+<summary><b>Guide: Cursor</b></summary>
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=tulip-mcp&config=eyJjb21tYW5kIjoibm9kZSAvcGF0aC90by95b3VyL3R1bGlwLW1jcC9zcmMvaW5kZXguanMifQ%3D%3D)
+
+After clicking the button, a dialog will appear. You must **edit the `Command` field** to provide the correct absolute path to the `index.js` file inside your downloaded `tulip-mcp` folder.
+
+Once you've updated the path, click "Install".
+
+</details>
 
 
 Once configured, your MCP client will run the server when it needs to. If you make any changes to your `.env` file, you must restart the server in your MCP Client for the changes to take effect.
