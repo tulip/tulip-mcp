@@ -65,7 +65,7 @@ Follow these steps if you want to download the server's source code to make chan
     3.  **Download the Server Code:**
         -   Copy and paste the following command and press `Enter`:
             ```cmd
-            git clone https://github.com/tulip-ecosystem/tulip-mcp.git
+            git clone https://github.com/tulip/tulip-mcp.git
             ```
     
     4.  **Enter the Server Directory:**
@@ -104,7 +104,7 @@ Follow these steps if you want to download the server's source code to make chan
     3.  **Download the Server Code:**
         -   Copy and paste the following command and press `Enter`:
             ```bash
-            git clone https://github.com/tulip-ecosystem/tulip-mcp.git
+            git clone https://github.com/tulip/tulip-mcp.git
             ```
     
     4.  **Enter the Server Directory:**
