@@ -3,16 +3,11 @@
  */
 
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
 import path from 'path';
 import { logger } from '../utils/Logger.js';
 
-// Get the directory of the current module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables from the project root
-const envPath = path.join(__dirname, '../../../.env');
+// Load environment variables from the directory where the command was run
+const envPath = path.join(process.cwd(), '.env');
 const result = dotenv.config({ path: envPath });
 
 // Debug environment loading
