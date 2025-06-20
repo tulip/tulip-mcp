@@ -6,26 +6,31 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { logger } from '../utils/Logger.js';
 
-// Load environment variables from the directory where the command was run
-const envPath = path.join(process.cwd(), '.env');
-const result = dotenv.config({ path: envPath });
-
-// Debug environment loading
-if (result.error) {
-  console.error('Error loading .env file:', result.error.message);
-  console.error('Looking for .env file at:', envPath);
-} else {
-  // Env file loaded successfully
-}
-
 /**
  * Environment configuration class that handles all environment variable loading and validation
  */
 export class Environment {
-  constructor() {
+  constructor({ envPath: customEnvPath } = {}) {
+    this.loadEnvFile(customEnvPath);
     this.loadConfiguration();
     this.validateConfiguration();
     this.logConfiguration();
+  }
+
+  loadEnvFile(customEnvPath) {
+    // Determine the path to the .env file.
+    // 1. Use the custom path if provided.
+    // 2. Otherwise, fall back to the current working directory.
+    const envPath = customEnvPath || path.join(process.cwd(), '.env');
+    const result = dotenv.config({ path: envPath });
+
+    // Debug environment loading
+    if (result.error) {
+      console.error(`Error loading .env file: ${result.error.message}`);
+      console.error(`Attempted to load .env file from: ${path.resolve(envPath)}`);
+      // It's not a fatal error here, as env vars could be set globally.
+      // The validation step will catch missing required variables.
+    }
   }
 
   loadConfiguration() {

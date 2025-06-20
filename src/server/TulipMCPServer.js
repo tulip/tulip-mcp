@@ -20,14 +20,14 @@ import { ToolHandlers } from './tools/ToolHandlers.js';
  * Main Tulip MCP Server class that orchestrates all components
  */
 export class TulipMCPServer {
-  constructor() {
-    this.initializeComponents();
+  constructor({ envPath } = {}) {
+    this.initializeComponents({ envPath });
     this.setupHandlers();
   }
 
-  initializeComponents() {
+  initializeComponents({ envPath }) {
     // Load environment configuration
-    this.environment = new Environment();
+    this.environment = new Environment({ envPath });
 
     // Initialize tool definitions first (required by tool selection)
     this.toolDefinitions = new ToolDefinitions();

@@ -4,6 +4,7 @@
  * Entry point for the Tulip MCP Server
  */
 
+import minimist from 'minimist';
 import { TulipMCPServer } from './server/TulipMCPServer.js';
 import { logger } from './server/utils/Logger.js';
 
@@ -14,15 +15,19 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  logger.debug('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 
+// Parse command-line arguments
+const argv = minimist(process.argv.slice(2));
+
 // Start the server with error handling
 try {
-  const server = new TulipMCPServer();
+  // Pass the --env path if it exists
+  const server = new TulipMCPServer({ envPath: argv.env });
   server.run().catch((error) => {
-    logger.debug('Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   });
 } catch (error) {

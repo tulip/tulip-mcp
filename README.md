@@ -36,19 +36,34 @@ The server will start and is now ready to be connected to an MCP client.
 
 ## 🔌 Connecting to an MCP Client
 
-Once the server is running, you need to tell your client application how to connect to it.
+When using a client, the server is run in a different environment where it may not find your `.env` file automatically. To solve this, you must provide the full path to your `.env` file using the `--env` flag.
+
+<details>
+<summary><b>Guide: Finding Your .env File Path</b></summary>
+
+1.  Navigate to the folder where you created your `.env` file.
+2.  **On Windows:** Right-click the `.env` file while holding down the `Shift` key, then select **"Copy as path"**.
+3.  **On macOS:** Right-click the `.env` file, hold down the `Option` key, then select **"Copy .env as Pathname"**.
+4.  You will use this copied path in the client configuration below.
+
+</details>
 
 <details>
 <summary><b>Guide: Claude Desktop</b></summary>
 
 1.  From the Claude Desktop menu bar, select **Settings...** > **Developer** > **Edit Config**.
 2.  This will open the `claude_desktop_config.json` file.
-3.  Add the server configuration inside the `mcpServers` object as shown below.
+3.  Add the server configuration inside the `mcpServers` object. **You must replace `"C:\\path\\to\\your\\.env"` with the actual path you copied.**
     ```json
     {
       "mcpServers": {
         "tulip-mcp": {
-          "command": "npx @tulip/mcp-server"
+          "command": "npx",
+          "args": [
+            "@tulip/mcp-server",
+            "--env",
+            "C:\\path\\to\\your\\.env"
+          ]
         }
       }
     }
@@ -62,9 +77,11 @@ Once the server is running, you need to tell your client application how to conn
 <details>
 <summary><b>Guide: Cursor</b></summary>
 
-For the easiest setup, click the button below. This will configure Cursor to run the server using `npx`.
+For the easiest setup, click the button below. This will pre-fill the command.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=tulip-mcp&config=eyJjb21tYW5kIjoibnB4IEB0dWxpcC9tY3Atc2VydmVyIn0%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=tulip-mcp&config=eyJjb21tYW5kIjoibnB4IEB0dWxpcC9tY3Atc2VydmVyIC0tZW52IEM6XFxwYXRoXFx0b1xceW91clxcLmVudiJ9)
+
+After clicking the button, **you must replace the placeholder text** (`REPLACE_WITH_YOUR_ENV_FILE_PATH_HERE`) with the full path to your `.env` file that you copied earlier.
 
 </details>
 
