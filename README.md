@@ -4,6 +4,10 @@ A Model Context Protocol (MCP) server that provides comprehensive access to the 
 with the Tulip manufacturing platform functionality including tables, records, machines, stations, interfaces, users,
 and more.
 
+## ✨ Prerequisites
+
+Before you begin, ensure you have [Node.js](https://nodejs.org/en/download) installed on your system. This is required to run the server.
+
 ## 🚀 Getting Started
 
 This guide will walk you through running the server and connecting it to an MCP client like Cursor or Claude Desktop.
