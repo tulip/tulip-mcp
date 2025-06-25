@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # Tulip MCP Server in Studio mode (traditional MCP server)
+  tulip-mcp-studio:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: tulip-mcp:latest
+    container_name: tulip-mcp-studio
+    restart: unless-stopped
+    environment:
+      # Mode configuration
+      MCP_MODE: studio
+
+      # Required Tulip API configuration
+      TULIP_API_KEY: ${TULIP_API_KEY}
+      TULIP_API_SECRET: ${TULIP_API_SECRET}
+      TULIP_BASE_URL: ${TULIP_BASE_URL}
+
+      # API Key Type Configuration:
+      # - For Workspace API Keys: Leave TULIP_WORKSPACE_ID empty or unset
+      # - For Account API Keys: Set TULIP_WORKSPACE_ID to your workspace ID
+      TULIP_WORKSPACE_ID: ${TULIP_WORKSPACE_ID:-}
+
+      # MCP Server configuration
+      MCP_SERVER_NAME: ${MCP_SERVER_NAME:-tulip-mcp}
+      MCP_SERVER_VERSION: ${MCP_SERVER_VERSION:-1.1.2}
+      MCP_DEBUG: ${MCP_DEBUG:-false}
+
+      # API Rate limiting configuration
+      MCP_MAX_RETRIES: ${MCP_MAX_RETRIES:-3}
+      MCP_BASE_DELAY: ${MCP_BASE_DELAY:-1000}
+      MCP_MAX_DELAY: ${MCP_MAX_DELAY:-30000}
+
+      # Tool selection (comma-separated list of tools, categories, or types)
+      # Examples: "read-only", "tables", "stations", "getTable,listTables"
+      ENABLED_TOOLS: ${ENABLED_TOOLS:-read-only}
+
+    # Uncomment and configure volumes as needed for development
+    # volumes:
+    #   - ../.env:/app/.env:ro
+    #   - ../src:/app/src:ro
+
+  # Tulip MCP Server in Supergateway mode (SSE/WebSocket for web clients)
+  tulip-mcp-supergateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: tulip-mcp:latest
+    container_name: tulip-mcp-supergateway
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_PORT:-3000}:3000"
+    environment:
+      # Mode configuration
+      MCP_MODE: supergateway
+
+      # Required Tulip API configuration
+      TULIP_API_KEY: ${TULIP_API_KEY}
+      TULIP_API_SECRET: ${TULIP_API_SECRET}
+      TULIP_BASE_URL: ${TULIP_BASE_URL}
+
+      # API Key Type Configuration:
+      # - For Workspace API Keys: Leave TULIP_WORKSPACE_ID empty or unset
+      # - For Account API Keys: Set TULIP_WORKSPACE_ID to your workspace ID
+      TULIP_WORKSPACE_ID: ${TULIP_WORKSPACE_ID:-}
+
+      # MCP Server configuration
+      MCP_SERVER_NAME: ${MCP_SERVER_NAME:-tulip-mcp}
+      MCP_SERVER_VERSION: ${MCP_SERVER_VERSION:-1.1.2}
+      MCP_DEBUG: ${MCP_DEBUG:-false}
+
+      # API Rate limiting configuration
+      MCP_MAX_RETRIES: ${MCP_MAX_RETRIES:-3}
+      MCP_BASE_DELAY: ${MCP_BASE_DELAY:-1000}
+      MCP_MAX_DELAY: ${MCP_MAX_DELAY:-30000}
+
+      # Tool selection (comma-separated list of tools, categories, or types)
+      # Examples: "read-only", "tables", "stations", "getTable,listTables"
+      ENABLED_TOOLS: ${ENABLED_TOOLS:-read-only}
+
+      # Supergateway-specific configuration
+      GATEWAY_PORT: 3000
+
+      # Optional authentication (Bearer token)
+      AUTH_TOKEN: ${AUTH_TOKEN:-}
+
+      # Optional custom headers (semicolon-separated)
+      # Example: "X-Custom-Header: value1;X-Another-Header: value2"
+      CUSTOM_HEADERS: ${CUSTOM_HEADERS:-}
+
+    # Uncomment and configure volumes as needed for development
+    # volumes:
+    #   - ../.env:/app/.env:ro
+    #   - ../src:/app/src:ro
+
+# Example .env file configuration:
+#
+# # Required Tulip API configuration
+# TULIP_API_KEY=your_api_key_here
+# TULIP_API_SECRET=your_api_secret_here
+# TULIP_BASE_URL=https://your-company.tulip.co
+#
+# # API Key Type (choose one):
+# # For Workspace API Keys (leave empty):
+# # TULIP_WORKSPACE_ID=
+# # For Account API Keys (set your workspace ID):
+# # TULIP_WORKSPACE_ID=your_workspace_id_here
+#
+# # Optional configuration
+# ENABLED_TOOLS=read-only
+# MCP_DEBUG=false
+# GATEWAY_PORT=3000
+# AUTH_TOKEN=your_bearer_token_here
+# CUSTOM_HEADERS=X-Custom-Header: value1;X-Another-Header: value2

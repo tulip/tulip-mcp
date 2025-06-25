@@ -1,0 +1,27 @@
+# Version control
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+
+# Environment variables
+.env
+.env.*
+
+# Development files
+*.log
+*.md
+!README.md
+!tools.md
+!SUPERGATEWAY.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Other unnecessary files
+.DS_Store
+*.swp
+*.swo
