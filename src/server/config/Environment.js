@@ -38,6 +38,12 @@ export class Environment {
     this.apiKey = process.env.TULIP_API_KEY;
     this.apiSecret = process.env.TULIP_API_SECRET;
     this.baseUrl = process.env.TULIP_BASE_URL;
+
+    // Remove trailing slash from baseUrl if it exists
+    if (this.baseUrl && this.baseUrl.endsWith('/')) {
+      this.baseUrl = this.baseUrl.slice(0, -1);
+    }
+
     this.workspaceId = process.env.TULIP_WORKSPACE_ID;
 
     // MCP server configuration
