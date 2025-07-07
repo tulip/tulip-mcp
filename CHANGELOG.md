@@ -7,6 +7,11 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ---
+## [1.1.3] - 2025-07-07
+### Added
+- Multi-workspace support in `README.md`
+- Support for trailing `/` in instance url
+
 ## [1.1.2] - 2025-06-20
 ### Added
 - Ability to specify path to env file as argument in mcp config json
