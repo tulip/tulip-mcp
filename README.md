@@ -124,6 +124,86 @@ ENABLED_TOOLS=read-only,interface,station,user
 ENABLED_TOOLS=read-only,write,admin
 ```
 
+### Multiple Workspace Configuration (Enterprise)
+
+If your organization uses multiple Tulip workspaces or instances, you can set up multiple MCP servers to access all of them simultaneously. This lets you work with data from all your workspaces in a single conversation.
+
+#### Understanding Your API Credentials
+
+**Before you begin**, check what type of API credentials you have:
+
+- **Workspace API Credentials**: Created in **Workspace Settings** → **API Tokens**
+  - ✅ Already know which workspace they belong to
+  - ✅ **Do NOT include** `TULIP_WORKSPACE_ID` in your `.env` file
+  - ✅ Most common type for individual workspaces
+
+- **Account API Credentials**: Created in **Account Settings** → **API Tokens**  
+  - ⚠️ Can access multiple workspaces
+  - ⚠️ **Must include** `TULIP_WORKSPACE_ID` in your `.env` file
+
+> **Not sure which type you have?** Check where you created your API token. If you created it in Workspace Settings, you have Workspace API credentials.
+
+#### Step-by-Step Setup
+
+**Step 1: Create separate `.env` files for each workspace**
+
+Follow the same process from [Section 1: Configure Your Credentials](#1-configure-your-credentials), but create separate files:
+```
+production-workspace.env
+development-workspace.env
+```
+
+**Step 2: Configure each `.env` file**
+
+For each workspace, create a `.env` file with the appropriate credentials:
+
+**If using Workspace API Credentials:**
+```env
+# production-workspace.env
+TULIP_API_KEY=your_production_workspace_api_key
+TULIP_API_SECRET=your_production_workspace_secret
+TULIP_BASE_URL=https://your-instance.tulip.co
+ENABLED_TOOLS=read-only,table,station
+```
+
+**If using Account API Credentials:**
+```env
+# production-workspace.env
+TULIP_API_KEY=your_account_api_key
+TULIP_API_SECRET=your_account_secret
+TULIP_BASE_URL=https://your-instance.tulip.co
+TULIP_WORKSPACE_ID=PRODUCTION_WORKSPACE_ID
+ENABLED_TOOLS=read-only,table,station
+```
+
+**Step 3: Connect multiple servers to your MCP client**
+
+Add each workspace as a separate server with a unique name using the guides from [Section: Connecting to an MCP Client](#-connecting-to-an-mcp-client):
+
+**For Claude Desktop:**
+```json
+{
+  "mcpServers": {
+    "tulip-production": {
+      "command": "npx",
+      "args": ["@tulip/mcp-server", "--env", "/full/path/to/production-workspace.env"]
+    },
+    "tulip-qa": {
+      "command": "npx", 
+      "args": ["@tulip/mcp-server", "--env", "/full/path/to/qa-workspace.env"]
+    }
+  }
+}
+```
+
+**For Cursor:** Use the install button multiple times, once for each `.env` file.
+
+#### Tips for Success
+
+- **Use clear server names** like `tulip-production`, `tulip-qa`, `tulip-development`
+- **Test each workspace separately** first to ensure credentials work
+- Only enable the tools you need. Enabling too many tools (40+) can confuse the AI.
+
 ### API Documentation
 
 For detailed tool documentation including complete parameter lists, examples, and required permissions, **generate the `TOOLS.md` file by running `npm run docs`**.

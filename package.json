@@ -21,7 +21,8 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "standard-version": "^9.5.0"
   },
   "keywords": [
     "mcp",
