@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ---
+## [1.1.4] - 2026-01-05
+### Security
+- Updated `@modelcontextprotocol/sdk` from 1.12.1 to 1.25.1 (fixes DNS rebinding protection vulnerability)
+- Updated `qs` from 6.14.0 to 6.14.1 (fixes CVE-2025-15284 - DoS via memory exhaustion)
+- Updated `body-parser` from 2.2.0 to 2.2.1 (fixes DoS vulnerability with URL encoding)
+
 ## [1.1.3] - 2025-07-07
 ### Added
 - Multi-workspace support in `README.md`
