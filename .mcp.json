@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tulip": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/src/index.js",
+        "--env",
+        "${CLAUDE_PLUGIN_DATA}/.env"
+      ]
+    }
+  }
+}

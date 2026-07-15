@@ -7,6 +7,11 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ---
+## [1.2.0] - 2026-07-15
+### Added
+- Claude Code plugin support: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, and `.mcp.json` for one-step installation via a marketplace
+- Guided skills for common workflows: setup-credentials, explore-instance, manage-tables, manage-stations, manage-users, and manage-machines
+
 ## [1.1.4] - 2026-01-05
 ### Security
 - Updated `@modelcontextprotocol/sdk` from 1.12.1 to 1.25.1 (fixes DNS rebinding protection vulnerability)

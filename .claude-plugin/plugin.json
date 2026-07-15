@@ -1,0 +1,21 @@
+{
+  "name": "tulip",
+  "displayName": "Tulip MCP",
+  "description": "Tulip MCP server — 71 tools for managing tables, stations, users, and machines against a Tulip instance. Includes guided skills for common workflows like managing tables, exploring an instance, and configuring stations.",
+  "author": {
+    "name": "Brennan Reamer"
+  },
+  "repository": "https://github.com/tulip/tulip-mcp",
+  "license": "Apache-2.0",
+  "keywords": [
+    "tulip",
+    "mcp",
+    "manufacturing",
+    "frontline-operations",
+    "tables",
+    "stations",
+    "machines"
+  ],
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
+}

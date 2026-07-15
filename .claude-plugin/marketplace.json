@@ -1,0 +1,13 @@
+{
+  "name": "tulip-marketplace",
+  "owner": {
+    "name": "Brennan Reamer"
+  },
+  "plugins": [
+    {
+      "name": "tulip",
+      "source": "./",
+      "description": "Tulip MCP server with guided skills for managing tables, stations, users, and machines against a Tulip instance."
+    }
+  ]
+}
