@@ -42,41 +42,53 @@ Documents folder). Do not ask them to share the values here.
 
 ## Resolving the data directory path
 
-The plugin's persistent data directory is:
+The plugin's persistent data directory is derived from the plugin identifier. For
+standard marketplace installs, the identifier is `tulip@tulip-marketplace`, which
+resolves to:
 
 ```
-~/.claude/plugins/data/tulip-marketplace/
+~/.claude/plugins/data/tulip-tulip-marketplace/
 ```
 
-If that exact directory does not exist yet, it will be created in the next step. Do
-not guess a different path — use exactly this one.
+To confirm the correct path at runtime, read `~/.claude/plugins/installed_plugins.json`
+and find the key that starts with `tulip@`. The data directory name is that key with
+every non-alphanumeric character replaced by a hyphen. For example, `tulip@tulip-marketplace`
+becomes `tulip-tulip-marketplace`.
 
 ## Steps
 
-1. Ask the user for the full path to their filled-in `.env` file. Example prompt:
+1. Discover the data directory by reading `~/.claude/plugins/installed_plugins.json`:
+   ```
+   cat ~/.claude/plugins/installed_plugins.json
+   ```
+   Find the key matching `tulip@*` in the `plugins` object. Replace every
+   non-alphanumeric character in that key with `-` to get the directory name.
+   The full path is `~/.claude/plugins/data/<directory-name>/`.
+
+2. Ask the user for the full path to their filled-in `.env` file. Example prompt:
    "What's the full path to your Tulip `.env` file? (e.g. `C:\Users\you\Documents\tulip.env`)"
 
-2. Confirm the file exists before copying (list metadata only, never contents):
+3. Confirm the file exists before copying (list metadata only, never contents):
    ```
    ls -la "<user-provided-path>"
    ```
    If it does not exist, tell the user and ask again. Do not proceed.
 
-3. Copy it into the plugin's persistent data directory (create the dir if needed) and
+4. Copy it into the plugin's persistent data directory (create the dir if needed) and
    restrict permissions so only the owner can read it:
    ```
-   mkdir -p ~/.claude/plugins/data/tulip-marketplace
-   cp "<user-provided-path>" ~/.claude/plugins/data/tulip-marketplace/.env
-   chmod 600 ~/.claude/plugins/data/tulip-marketplace/.env
+   mkdir -p ~/.claude/plugins/data/<directory-name>
+   cp "<user-provided-path>" ~/.claude/plugins/data/<directory-name>/.env
+   chmod 600 ~/.claude/plugins/data/<directory-name>/.env
    ```
    Never open, cat, or print the file's contents.
 
-4. Confirm the copy landed (metadata only):
+5. Confirm the copy landed (metadata only):
    ```
-   ls -la ~/.claude/plugins/data/tulip-marketplace/.env
+   ls -la ~/.claude/plugins/data/<directory-name>/.env
    ```
 
-5. Tell the user to reload the plugin so the server picks up the credentials:
+6. Tell the user to reload the plugin so the server picks up the credentials:
    "Credentials are in place. Run `/reload-plugins` (or restart Claude Code) to connect."
 
 ## Notes

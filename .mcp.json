@@ -1,9 +1,10 @@
 {
   "mcpServers": {
     "tulip": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "${CLAUDE_PLUGIN_ROOT}/src/index.js",
+        "-y",
+        "@tulip/mcp-server",
         "--env",
         "${CLAUDE_PLUGIN_DATA}/.env"
       ]

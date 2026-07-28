@@ -91,7 +91,21 @@ After clicking the button, **you must replace the placeholder text** (`REPLACE_W
 
 ---
 
-## 🛠️ Developer Guide
+## Claude Code plugin
+
+If you use [Claude Code](https://docs.anthropic.com/en/docs/claude-code), you can install the server as a plugin. This adds the MCP tools and a set of guided skills for common workflows.
+
+```bash
+claude plugin add --marketplace https://github.com/tulip/tulip-mcp
+```
+
+After installing, run the **setup-credentials** skill to place your `.env` file in the plugin's persistent data directory. The plugin handles the rest.
+
+> The plugin launches the server via `npx @tulip/mcp-server`, so there is nothing extra to install. Credentials are stored outside the plugin directory and survive updates.
+
+---
+
+## Developer guide
 
 This section contains more advanced configuration features.
 
