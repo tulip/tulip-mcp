@@ -3,6 +3,9 @@
   "owner": {
     "name": "Brennan Reamer"
   },
+  "metadata": {
+    "description": "Official marketplace for the Tulip MCP server plugin, which connects Claude Code to a Tulip instance."
+  },
   "plugins": [
     {
       "name": "tulip",

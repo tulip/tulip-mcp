@@ -4,13 +4,13 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
----
-## [1.2.0] - 2026-07-15
+## [1.2.0] - 2026-08-05
 ### Added
-- Claude Code plugin support: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, and `.mcp.json` for one-step installation via a marketplace
+- Claude Code plugin support: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` for one-step installation via a marketplace
 - Guided skills for common workflows: setup-credentials, explore-instance, manage-tables, manage-stations, manage-users, and manage-machines
+
+### Removed
+- Stale `mcp.json` example config left over from the manual installation instructions removed in 1.1.1
 
 ## [1.1.4] - 2026-01-05
 ### Security

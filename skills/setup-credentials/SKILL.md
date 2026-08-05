@@ -57,35 +57,49 @@ becomes `tulip-tulip-marketplace`.
 
 ## Steps
 
-1. Discover the data directory by reading `~/.claude/plugins/installed_plugins.json`:
-   ```
-   cat ~/.claude/plugins/installed_plugins.json
-   ```
-   Find the key matching `tulip@*` in the `plugins` object. Replace every
-   non-alphanumeric character in that key with `-` to get the directory name.
-   The full path is `~/.claude/plugins/data/<directory-name>/`.
+Commands below are given for POSIX shells (macOS, Linux, and Git Bash on Windows)
+and for PowerShell. Pick the set that matches the user's shell.
+
+1. Discover the data directory by reading `~/.claude/plugins/installed_plugins.json`
+   with the Read tool. Find the key matching `tulip@*` in the `plugins` object.
+   Replace every non-alphanumeric character in that key with `-` to get the directory
+   name. The full path is `~/.claude/plugins/data/<directory-name>/`.
 
 2. Ask the user for the full path to their filled-in `.env` file. Example prompt:
-   "What's the full path to your Tulip `.env` file? (e.g. `C:\Users\you\Documents\tulip.env`)"
+   "What's the full path to your Tulip `.env` file? (e.g. `/Users/you/Documents/tulip.env`
+   or `C:\Users\you\Documents\tulip.env`)"
 
 3. Confirm the file exists before copying (list metadata only, never contents):
-   ```
+   ```bash
    ls -la "<user-provided-path>"
+   ```
+   ```powershell
+   Get-Item "<user-provided-path>" | Select-Object FullName, Length, LastWriteTime
    ```
    If it does not exist, tell the user and ask again. Do not proceed.
 
-4. Copy it into the plugin's persistent data directory (create the dir if needed) and
-   restrict permissions so only the owner can read it:
-   ```
+4. Copy it into the plugin's persistent data directory, creating the directory if
+   needed:
+   ```bash
    mkdir -p ~/.claude/plugins/data/<directory-name>
    cp "<user-provided-path>" ~/.claude/plugins/data/<directory-name>/.env
    chmod 600 ~/.claude/plugins/data/<directory-name>/.env
    ```
+   ```powershell
+   New-Item -ItemType Directory -Force -Path "$HOME\.claude\plugins\data\<directory-name>"
+   Copy-Item "<user-provided-path>" "$HOME\.claude\plugins\data\<directory-name>\.env"
+   ```
+   The `chmod` step restricts the file to the owner and applies to POSIX shells only.
+   On Windows, the file inherits the user profile's permissions, which are already
+   limited to that user — tell the user this rather than trying to set an ACL.
    Never open, cat, or print the file's contents.
 
 5. Confirm the copy landed (metadata only):
-   ```
+   ```bash
    ls -la ~/.claude/plugins/data/<directory-name>/.env
+   ```
+   ```powershell
+   Get-Item "$HOME\.claude\plugins\data\<directory-name>\.env" | Select-Object FullName, Length, LastWriteTime
    ```
 
 6. Tell the user to reload the plugin so the server picks up the credentials:
@@ -98,5 +112,6 @@ becomes `tulip-tulip-marketplace`.
 - If the user is running the server standalone (not as a plugin), a `.env` in the repo
   root is used instead — this skill is only needed for plugin installs.
 - The `ENABLED_TOOLS` environment variable in `.env` controls which tools are active.
-  Default is `read-only`. To enable write tools, set `ENABLED_TOOLS=table,read-only,write`
-  or specific categories. See `env.example` for full options.
+  Default is `read-only`, which exposes 30 of the 71 tools. To enable write tools, set
+  `ENABLED_TOOLS=read-only,write` or a list of specific categories, types, or tool
+  names. See `env.example` for full options.
