@@ -15,14 +15,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "dotenv": "^16.5.0",
     "minimist": "^1.2.8",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "standard-version": "^9.5.0"
+    "@types/node": "^20.0.0"
   },
   "keywords": [
     "mcp",

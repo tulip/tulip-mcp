@@ -9,6 +9,12 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 - Claude Code plugin support: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` for one-step installation via a marketplace
 - Guided skills for common workflows: setup-credentials, explore-instance, manage-tables, manage-stations, manage-users, and manage-machines
 
+### Security
+- Updated `@modelcontextprotocol/sdk` from 1.25.2 to 1.30.0, clearing 8 advisories in the production dependency tree (`hono`, `@hono/node-server`, `path-to-regexp`, `qs`, `body-parser`, and the SDK itself)
+- Updated `ajv` to 8.20.0 and `fast-uri` to 3.1.5 (path traversal and ReDoS advisories)
+- Removed the unused `standard-version` dev dependency, which pulled in a critical `handlebars` advisory along with `lodash`, `minimatch`, and `brace-expansion`. The package is abandoned upstream and nothing in the repo invoked it
+- `npm audit` now reports zero vulnerabilities
+
 ### Removed
 - Stale `mcp.json` example config left over from the manual installation instructions removed in 1.1.1
 
