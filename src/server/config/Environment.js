@@ -4,7 +4,10 @@
 
 import dotenv from 'dotenv';
 import path from 'path';
+import { createRequire } from 'module';
 import { logger } from '../utils/Logger.js';
+
+const { version: packageVersion } = createRequire(import.meta.url)('../../../package.json');
 
 /**
  * Environment configuration class that handles all environment variable loading and validation
@@ -48,7 +51,7 @@ export class Environment {
 
     // MCP server configuration
     this.serverName = process.env.MCP_SERVER_NAME || 'tulip-mcp';
-    this.serverVersion = process.env.MCP_SERVER_VERSION || '1.0.0';
+    this.serverVersion = process.env.MCP_SERVER_VERSION || packageVersion;
 
     // Rate limiting configuration
     this.maxRetries = parseInt(process.env.MCP_MAX_RETRIES) || 3;

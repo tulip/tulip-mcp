@@ -91,13 +91,30 @@ After clicking the button, **you must replace the placeholder text** (`REPLACE_W
 
 ---
 
-## 🛠️ Developer Guide
+## Claude Code plugin
+
+If you use [Claude Code](https://docs.anthropic.com/en/docs/claude-code), you can install the server as a plugin. This adds the MCP tools and a set of guided skills for common workflows.
+
+```bash
+claude plugin marketplace add tulip/tulip-mcp
+claude plugin install tulip@tulip-marketplace
+```
+
+After installing, run the **setup-credentials** skill to place your `.env` file in the plugin's persistent data directory. The plugin handles the rest.
+
+By default the server exposes only the `read-only` tools (30 of the 71). To use the write and admin tools, set `ENABLED_TOOLS` in that same `.env` file — for example `ENABLED_TOOLS=read-only,write` — and reload the plugin. See [Tool Selection Configuration](#tool-selection-configuration) for all options.
+
+> The plugin launches the server via `npx @tulip/mcp-server`, so there is nothing extra to install. Credentials are stored outside the plugin directory and survive updates.
+
+---
+
+## Developer guide
 
 This section contains more advanced configuration features.
 
 ### Tool Selection Configuration
 
-By default, the server enables only `read-only` tools and `table` tools for safety. You can customize which tools are available using the `ENABLED_TOOLS` environment variable in your `.env` file.
+By default, the server enables only the `read-only` tools for safety. You can customize which tools are available using the `ENABLED_TOOLS` environment variable in your `.env` file.
 
 The `ENABLED_TOOLS` variable accepts a comma-separated list that can include:
 

@@ -1,0 +1,16 @@
+{
+  "name": "tulip-marketplace",
+  "owner": {
+    "name": "Brennan Reamer"
+  },
+  "metadata": {
+    "description": "Official marketplace for the Tulip MCP server plugin, which connects Claude Code to a Tulip instance."
+  },
+  "plugins": [
+    {
+      "name": "tulip",
+      "source": "./",
+      "description": "Tulip MCP server with guided skills for managing tables, stations, users, and machines against a Tulip instance."
+    }
+  ]
+}
