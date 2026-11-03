@@ -16,6 +16,9 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 - `runTableAggregation` `limit` is optional (default 100000)
 - `npm test` runs a regression suite for table reads and query serialization
 
+### Security
+- Updated `@modelcontextprotocol/sdk` from 1.30.0 to 1.32.2 and refreshed transitive dependencies (`proxy-addr`, `zod`, `hono`, `@hono/node-server`, `qs`, `fast-uri`, `ip-address`, `body-parser`), clearing all 33 open Dependabot alerts. `npm audit` reports zero vulnerabilities
+
 ## [1.2.0] - 2026-08-05
 ### Added
 - Claude Code plugin support: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` for one-step installation via a marketplace
