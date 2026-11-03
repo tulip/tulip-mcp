@@ -39,9 +39,19 @@ describe('runTableAggregation request shape (bugs 1 and 2)', () => {
     assert.equal(api.calls[0].query.sortOptions, JSON.stringify(NEWEST_FIRST));
   });
 
+  test('a single sort or filter object is treated as a one-item list', () => {
+    const sort = { sortBy: 'qty', sortDir: 'asc' };
+    const { query, sortProvided } = buildAggregationQuery({ function: 'max', fieldId: 'qty', sortOptions: sort, filters: JSON.stringify(OPEN[0]) });
+    assert.equal(sortProvided, true);
+    assert.equal(query.sortOptions, JSON.stringify([sort]));
+    assert.equal(query.filters, JSON.stringify(OPEN));
+  });
+
   test('limit defaults to the API maximum and is validated', () => {
     assert.equal(buildAggregationQuery({ function: 'count', fieldId: 'id' }).query.limit, AGGREGATION_MAX_LIMIT);
-    assert.throws(() => buildAggregationQuery({ function: 'count', fieldId: 'id', limit: 0 }), /limit must be/);
+    assert.equal(buildAggregationQuery({ function: 'count', fieldId: 'id', limit: 0 }).query.limit, AGGREGATION_MAX_LIMIT);
+    assert.equal(buildAggregationQuery({ function: 'count', fieldId: 'id', limit: '50' }).query.limit, 50);
+    assert.throws(() => buildAggregationQuery({ function: 'count', fieldId: 'id', limit: 'lots' }), /limit must be/);
     assert.throws(() => buildAggregationQuery({ function: 'count', fieldId: 'id', limit: AGGREGATION_MAX_LIMIT + 1 }), /limit must be/);
   });
 });
@@ -213,6 +223,13 @@ describe('listTableRecords (item 5)', () => {
     const api = fakeApiClient(() => []);
     const { notes } = await listTableRecords(api, { tableId: 'T1', limit: 200 });
     assert.match(notes[0], /No sortOptions/);
+  });
+
+  test('numeric strings and 0 are accepted for limit and offset, as before', async () => {
+    const api = fakeApiClient(() => []);
+    await listTableRecords(api, { tableId: 'T1', limit: '5', offset: '20' });
+    await listTableRecords(api, { tableId: 'T1', limit: 0, offset: 0 });
+    assert.deepEqual(api.calls.map(c => c.query), [{ limit: '5', offset: '20' }, {}]);
   });
 
   test('limit and offset are validated', async () => {

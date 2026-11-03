@@ -29,24 +29,35 @@ const MAX_FALLBACK_SCAN_PAGES = 10;
 
 /**
  * Encode a filters/sortOptions/fields argument as the single JSON query value
- * the Tables API expects. Accepts an array/object or an already-encoded string.
+ * the Tables API expects. Accepts an array, a single object, or either one
+ * already encoded as a JSON string.
  */
 export function toJsonParam(value, name) {
-  if (value === undefined || value === null || value === '') return undefined;
+  const list = parseList(value, name);
+  return list.length ? JSON.stringify(list) : undefined;
+}
+
+function parseList(value, name = 'value') {
+  if (value === undefined || value === null || value === '') return [];
+  let parsed = value;
   if (typeof value === 'string') {
     try {
-      JSON.parse(value);
+      parsed = JSON.parse(value);
     } catch {
       throw new Error(`${name} must be a JSON array (got ${JSON.stringify(value)})`);
     }
-    return value;
   }
-  return JSON.stringify(value);
+  return Array.isArray(parsed) ? parsed : [parsed];
 }
 
-function parseList(value) {
-  if (value === undefined || value === null || value === '') return [];
-  return typeof value === 'string' ? JSON.parse(value) : value;
+/**
+ * MCP clients sometimes send numbers as strings; 0 or blank means "not set",
+ * as it did before these arguments were validated.
+ */
+function toOptionalInt(value) {
+  if (value === undefined || value === null || value === '' || value === 0 || value === '0') return undefined;
+  const number = typeof value === 'string' ? Number(value.trim()) : value;
+  return Number.isNaN(number) ? value : number;
 }
 
 function isAnyAggregator(args) {
@@ -65,7 +76,7 @@ function validateLimit(limit, max, name = 'limit') {
  * current state rather than the oldest rows.
  */
 export function buildAggregationQuery(args) {
-  const limit = args.limit ?? AGGREGATION_MAX_LIMIT;
+  const limit = toOptionalInt(args.limit) ?? AGGREGATION_MAX_LIMIT;
   validateLimit(limit, AGGREGATION_MAX_LIMIT);
 
   const sortProvided = parseList(args.sortOptions).length > 0;
@@ -207,10 +218,11 @@ export async function runTableAggregation(apiClient, args) {
  * listTableRecords with sort, filter and field selection. A limit above the
  * API's 100-row page is served by paging with offset, up to LIST_RECORDS_MAX.
  */
-export async function listTableRecords(apiClient, args) {
-  const offset = args.offset ?? 0;
+export async function listTableRecords(apiClient, rawArgs) {
+  const args = { ...rawArgs, limit: toOptionalInt(rawArgs.limit) };
+  const offset = toOptionalInt(rawArgs.offset) ?? 0;
   if (!Number.isInteger(offset) || offset < 0) {
-    throw new Error(`offset must be a non-negative integer (got ${JSON.stringify(args.offset)})`);
+    throw new Error(`offset must be a non-negative integer (got ${JSON.stringify(rawArgs.offset)})`);
   }
   if (args.limit !== undefined) validateLimit(args.limit, LIST_RECORDS_MAX);
   const notes = [];
