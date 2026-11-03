@@ -24,36 +24,7 @@ export class ApiClient {
   }
 
   async makeRequest(endpoint, method = 'GET', body = null, queryParams = {}, customHeaders = {}) {
-    // Construct URL based on API key type and endpoint type
-    let fullUrl;
-
-    // Check if this is a next-gen API endpoint
-    const isNextGenApi = endpoint.startsWith('/api/stations/v1/') || endpoint.startsWith('/api/users/v1/');
-
-    if (isNextGenApi) {
-      // Next-gen APIs: workspace ID is embedded in the endpoint itself
-      // For Account API keys: /api/stations/v1/w/{workspaceId}/stations
-      // For Workspace API keys: /api/stations/v1/stations
-      fullUrl = `${this.baseUrl}${endpoint}`;
-    } else {
-      // Legacy APIs: add /api/v3 and handle workspace ID
-      if (this.isWorkspaceApiKey) {
-        // Workspace API Key: /api/v3/endpoint
-        fullUrl = `${this.baseUrl}/api/v3${endpoint}`;
-      } else {
-        // Account API Key: /api/v3/w/{workspaceId}/endpoint
-        fullUrl = `${this.baseUrl}/api/v3/w/${this.workspaceId}${endpoint}`;
-      }
-    }
-
-    const url = new URL(fullUrl);
-
-    // Add query parameters
-    Object.entries(queryParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        url.searchParams.append(key, value);
-      }
-    });
+    const url = this.buildUrl(endpoint, queryParams);
 
     const credentials = Buffer.from(`${this.apiKey}:${this.apiSecret}`).toString('base64');
 
@@ -137,6 +108,43 @@ export class ApiClient {
         throw new Error(`Request to ${url.toString()} failed after ${attempt} attempts: ${error.message}`);
       }
     }
+  }
+
+  // Helper method to build the request URL (respects API key type)
+  buildUrl(endpoint, queryParams = {}) {
+    let fullUrl;
+
+    // Check if this is a next-gen API endpoint
+    const isNextGenApi = endpoint.startsWith('/api/stations/v1/') || endpoint.startsWith('/api/users/v1/');
+
+    if (isNextGenApi) {
+      // Next-gen APIs: workspace ID is embedded in the endpoint itself
+      // For Account API keys: /api/stations/v1/w/{workspaceId}/stations
+      // For Workspace API keys: /api/stations/v1/stations
+      fullUrl = `${this.baseUrl}${endpoint}`;
+    } else {
+      // Legacy APIs: add /api/v3 and handle workspace ID
+      if (this.isWorkspaceApiKey) {
+        // Workspace API Key: /api/v3/endpoint
+        fullUrl = `${this.baseUrl}/api/v3${endpoint}`;
+      } else {
+        // Account API Key: /api/v3/w/{workspaceId}/endpoint
+        fullUrl = `${this.baseUrl}/api/v3/w/${this.workspaceId}${endpoint}`;
+      }
+    }
+
+    const url = new URL(fullUrl);
+
+    // Add query parameters. Tulip parses array/object query values (filters,
+    // sortOptions, fields) as one JSON value, so encode them here instead of
+    // letting URLSearchParams turn them into "[object Object]".
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
+      }
+    });
+
+    return url;
   }
 
   // Helper method to determine if an error is retryable

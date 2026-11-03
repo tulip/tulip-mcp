@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- `runTableAggregation` returned HTTP 400 whenever `filters` or `sortOptions` were passed: the arrays were sent as `[object Object]`. Array and object query values are now sent as the single JSON value the Tables API expects, for every tool
+- `runTableAggregation` now supports `min`, `max` and `count` on timestamp fields. The Tables API only allows `uniqueValues` on timestamps, so these are computed from the records endpoint
+- `runTableAggregation` kept the oldest records when `limit` was below the table size, so current-state results could be silently wrong. Without `sortOptions` it now keeps the newest records, and the result reports `matchingRecords`, `evaluatedRecords` and `truncated`
+
+### Added
+- `listTableRecords` accepts `sortOptions`, `filters`, `filterAggregator`, `fields` and `includeTotalCount`, and pages limits up to 1000 past the API's 100-record maximum
+- `runTableAggregation` `limit` is optional (default 100000)
+- `npm test` runs a regression suite for table reads and query serialization
+
 ## [1.2.0] - 2026-08-05
 ### Added
 - Claude Code plugin support: `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` for one-step installation via a marketplace

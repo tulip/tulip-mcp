@@ -54,6 +54,15 @@ updateTable(tableId="<tableId>", tableData={ ... })
 listTableRecords(tableId="<tableId>", limit=50, offset=0)
 ```
 
+**List the newest matching records, only the columns you need:**
+```
+listTableRecords(tableId="<tableId>", limit=200,
+  sortOptions=[{"sortBy": "_createdAt", "sortDir": "desc"}],
+  filters=[{"field": "<columnId>", "functionType": "equal", "arg": "OPEN"}],
+  fields=["id", "<columnId>"], includeTotalCount=true)
+```
+The API returns 10 records by default and 100 per request; limits up to 1000 are paged for you.
+
 **Get a single record:**
 ```
 getTableRecord(tableId="<tableId>", recordId="<recordId>")
@@ -128,6 +137,11 @@ deleteTableAggregation(tableId="<tableId>", aggregationId="<aggregationId>")
 runTableAggregation(tableId="<tableId>", function="sum", fieldId="<columnId>", limit=10000, filters=[...], sortOptions=[...])
 ```
 Valid functions: `sum`, `count`, `avg`, `min`, `max`, `mode`, `uniqueValues`.
+Numeric fields support all of them; text and boolean fields support `count`, `mode` and `uniqueValues`;
+timestamp fields support `min`, `max`, `count` and `uniqueValues`.
+
+`limit` defaults to 100000. When it is below the number of matching records, the newest records are kept
+(unless `sortOptions` say otherwise) and the result reports `truncated: true`.
 
 ---
 

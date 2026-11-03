@@ -1,6 +1,6 @@
 {
   "name": "listTableRecords",
-  "description": "Lists records of a Tulip Table. Corresponds to GET /tables/{tableId}/records. Requires `tables:read` scope. [READ-ONLY]",
+  "description": "Lists records of a Tulip Table, with optional sorting, filtering and column selection. Corresponds to GET /tables/{tableId}/records. Requires `tables:read` scope. [READ-ONLY]\n\nThe API returns 10 records by default and at most 100 per request; limits up to 1000 are fetched as several pages. Page further with offset. Without sortOptions the order is the API default (oldest first); for the latest records pass sortOptions [{\"sortBy\":\"_createdAt\",\"sortDir\":\"desc\"}]. To count records, use countTableRecords or runTableAggregation rather than counting returned rows.",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -10,11 +10,100 @@
       },
       "limit": {
         "type": "integer",
-        "description": "Maximum number of records to return"
+        "minimum": 1,
+        "maximum": 1000,
+        "description": "Maximum number of records to return (1-1000, API default 10). Above 100 the server is paged automatically."
       },
       "offset": {
         "type": "integer",
-        "description": "Number of records to skip"
+        "minimum": 0,
+        "description": "Number of records to skip (for paging)."
+      },
+      "sortOptions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "sortBy": {
+              "type": "string",
+              "description": "Column name, or a built-in: _createdAt, _updatedAt, _sequenceNumber."
+            },
+            "sortDir": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          "required": [
+            "sortBy",
+            "sortDir"
+          ]
+        },
+        "description": "Sort order, in priority order. Example: [{\"sortBy\":\"_createdAt\",\"sortDir\":\"desc\"}]"
+      },
+      "filters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string",
+              "description": "Column name (from getTable .columns[].name), or a built-in such as _createdAt."
+            },
+            "functionType": {
+              "type": "string",
+              "enum": [
+                "equal",
+                "notEqual",
+                "blank",
+                "notBlank",
+                "greaterThan",
+                "greaterThanOrEqual",
+                "lessThan",
+                "lessThanOrEqual",
+                "contains",
+                "notContains",
+                "startsWith",
+                "notStartsWith",
+                "endsWith",
+                "notEndsWith",
+                "isIn",
+                "notIsIn"
+              ],
+              "description": "Comparison function."
+            },
+            "arg": {
+            "type": "string",
+              "description": "Value to compare to. Omit for 'blank' and 'notBlank'. For timestamps use an ISO 8601 string."
+            }
+          },
+          "required": [
+            "field",
+            "functionType"
+          ]
+        },
+        "description": "Server-side filters. Example: [{\"field\":\"status\",\"functionType\":\"equal\",\"arg\":\"OPEN\"}]"
+      },
+      "filterAggregator": {
+        "type": "string",
+        "enum": [
+          "all",
+          "any"
+        ],
+        "description": "How to combine filters. Default 'all'."
+      },
+      "fields": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Only return these columns (names from getTable .columns[].name). Omit for all columns."
+      },
+      "includeTotalCount": {
+        "type": "boolean",
+        "description": "Also report how many records match the filters in total."
       }
     },
     "required": [
