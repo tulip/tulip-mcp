@@ -3,6 +3,7 @@
  */
 
 import { logger } from '../utils/Logger.js';
+import { countTableRecords, listTableRecords, runTableAggregation } from './tableReads.js';
 
 /**
  * Tool handlers class that contains all the business logic for executing tools
@@ -34,6 +35,8 @@ export class ToolHandlers {
 
     try {
       let result;
+      // Caveats a read tool wants the caller to see (e.g. truncation)
+      let notes = [];
       
       switch (name) {
         case 'listAppGroups':
@@ -84,10 +87,7 @@ export class ToolHandlers {
           break;
 
         case 'listTableRecords':
-          const queryParams = {};
-          if (args.limit) queryParams.limit = args.limit;
-          if (args.offset) queryParams.offset = args.offset;
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records`, 'GET', null, queryParams);
+          ({ records: result, notes } = await listTableRecords(this.apiClient, args));
           break;
 
         case 'createTableRecord':
@@ -111,25 +111,11 @@ export class ToolHandlers {
           break;
 
         case 'countTableRecords':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/count`);
+          result = await countTableRecords(this.apiClient, args);
           break;
 
         case 'runTableAggregation':
-          const aggQueryParams = {
-            'function': args['function'],
-            fieldId: args.fieldId,
-            limit: args.limit,
-          };
-          if (args.sortOptions) {
-            aggQueryParams.sortOptions = args.sortOptions;
-          }
-          if (args.filters) {
-            aggQueryParams.filters = args.filters;
-          }
-          if (args.filterAggregator) {
-            aggQueryParams.filterAggregator = args.filterAggregator;
-          }
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/runAggregation`, 'GET', null, aggQueryParams);
+          ({ notes, ...result } = await runTableAggregation(this.apiClient, args));
           break;
 
         case 'incrementTableRecordField':
@@ -479,6 +465,7 @@ export class ToolHandlers {
             type: 'text',
             text: JSON.stringify(result, null, 2),
           },
+          ...notes.map(note => ({ type: 'text', text: `Note: ${note}` })),
         ],
       };
     } catch (error) {

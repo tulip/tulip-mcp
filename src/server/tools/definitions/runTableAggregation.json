@@ -1,6 +1,6 @@
 {
   "name": "runTableAggregation",
-  "description": "Runs an aggregate function on a table field. Corresponds to GET /tables/{tableId}/runAggregation. Requires `tables:read` scope. [READ-ONLY]",
+  "description": "Runs an aggregate function on a table field. Corresponds to GET /tables/{tableId}/runAggregation. Requires `tables:read` scope. [READ-ONLY]\n\nThe response includes `matchingRecords`, `evaluatedRecords` and `truncated`; when `truncated` is true only part of the data was aggregated. Without sortOptions the NEWEST records (by _createdAt) are kept when limit is below the number of matching records. Timestamp fields support min, max, count and uniqueValues (min/max/count are computed from the records endpoint because the API itself only allows uniqueValues on timestamps).",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -10,7 +10,16 @@
       },
       "function": {
         "type": "string",
-        "description": "Aggregate function name. Valid values: [ \"sum\", \"count\", \"avg\", \"min\", \"max\", \"mode\", \"uniqueValues\" ]"
+        "enum": [
+          "sum",
+          "count",
+          "avg",
+          "min",
+          "max",
+          "mode",
+          "uniqueValues"
+        ],
+        "description": "Aggregate function. Numeric fields: all. Text/boolean: count, mode, uniqueValues. Timestamp: min, max, count, uniqueValues."
       },
       "fieldId": {
         "type": "string",
@@ -18,58 +27,90 @@
       },
       "limit": {
         "type": "integer",
-        "description": "The maximum number of table records to evaluate. Minimum 1, Maximum 100000."
+        "minimum": 1,
+        "maximum": 100000,
+        "description": "Maximum number of records to evaluate (1-100000, default 100000). Records beyond the limit are dropped, newest kept unless sortOptions say otherwise."
       },
       "sortOptions": {
         "type": "array",
-        "description": "Sorting allows to define which records are considered if there are more than the specified limit. Sort priority is determined by the order or options. Example: [{\"sortBy\": \"field1\", \"sortDir\": \"asc\"}]",
         "items": {
           "type": "object",
           "properties": {
             "sortBy": {
               "type": "string",
-              "description": "The field that records should be sorted by in the response."
+              "description": "Column name, or a built-in: _createdAt, _updatedAt, _sequenceNumber."
             },
             "sortDir": {
               "type": "string",
-              "description": "The direction of the records, 'asc' or 'desc'."
+              "enum": [
+                "asc",
+                "desc"
+              ]
             }
           },
-          "required": ["sortBy", "sortDir"]
-        }
+          "required": [
+            "sortBy",
+            "sortDir"
+          ]
+        },
+        "description": "Which records to keep when there are more than `limit`, in priority order. Default: [{\"sortBy\":\"_createdAt\",\"sortDir\":\"desc\"}] (newest first). Note: the API currently returns 500 for _sequenceNumber here; use _createdAt."
       },
       "filters": {
         "type": "array",
-        "description": "An optional array of filter expressions to filter the Table records by. Example: [{\"field\": \"field1\", \"functionType\": \"equal\", \"arg\": \"value1\"}]",
         "items": {
           "type": "object",
           "properties": {
             "field": {
               "type": "string",
-              "description": "The field to filter on."
+              "description": "Column name (from getTable .columns[].name), or a built-in such as _createdAt."
             },
             "functionType": {
               "type": "string",
-              "description": "The comparison function to use."
+              "enum": [
+                "equal",
+                "notEqual",
+                "blank",
+                "notBlank",
+                "greaterThan",
+                "greaterThanOrEqual",
+                "lessThan",
+                "lessThanOrEqual",
+                "contains",
+                "notContains",
+                "startsWith",
+                "notStartsWith",
+                "endsWith",
+                "notEndsWith",
+                "isIn",
+                "notIsIn"
+              ],
+              "description": "Comparison function."
             },
             "arg": {
-              "type": "string",
-              "description": "The value to compare to. Not required for 'blank' or 'notBlank'."
+            "type": "string",
+              "description": "Value to compare to. Omit for 'blank' and 'notBlank'. For timestamps use an ISO 8601 string."
             }
           },
-          "required": ["field", "functionType"]
-        }
+          "required": [
+            "field",
+            "functionType"
+          ]
+        },
+        "description": "Filters applied before aggregating. Example: [{\"field\":\"status\",\"functionType\":\"equal\",\"arg\":\"OPEN\"}]"
       },
       "filterAggregator": {
         "type": "string",
-        "description": "How to combine filters, 'all' or 'any'. Default is 'all'."
+        "enum": [
+          "all",
+          "any"
+        ],
+        "description": "How to combine filters. Default 'all'."
       }
     },
     "required": [
       "tableId",
       "function",
-      "fieldId",
-      "limit"
+      "fieldId"
     ]
   },
   "category": "read-only",

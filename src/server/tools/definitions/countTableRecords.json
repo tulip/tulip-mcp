@@ -1,12 +1,63 @@
 {
   "name": "countTableRecords",
-  "description": "Counts records in a Tulip Table. Corresponds to GET /tables/{tableId}/count. Requires `tables:read` scope. [READ-ONLY]",
+  "description": "Counts records in a Tulip Table, optionally only those matching filters. Corresponds to GET /tables/{tableId}/count. Requires `tables:read` scope. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableId": {
         "type": "string",
         "description": "The ID of the table to count records in"
+      },
+      "filters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": {
+              "type": "string",
+              "description": "Column name (from getTable .columns[].name), or a built-in such as _createdAt."
+            },
+            "functionType": {
+              "type": "string",
+              "enum": [
+                "equal",
+                "notEqual",
+                "blank",
+                "notBlank",
+                "greaterThan",
+                "greaterThanOrEqual",
+                "lessThan",
+                "lessThanOrEqual",
+                "contains",
+                "notContains",
+                "startsWith",
+                "notStartsWith",
+                "endsWith",
+                "notEndsWith",
+                "isIn",
+                "notIsIn"
+              ],
+              "description": "Comparison function."
+            },
+            "arg": {
+              "type": "string",
+              "description": "Value to compare to. Omit for 'blank' and 'notBlank'. For timestamps use an ISO 8601 string."
+            }
+          },
+          "required": [
+            "field",
+            "functionType"
+          ]
+        },
+        "description": "Only count records matching these filters. Example: [{\"field\":\"status\",\"functionType\":\"equal\",\"arg\":\"OPEN\"}]"
+      },
+      "filterAggregator": {
+        "type": "string",
+        "enum": [
+          "all",
+          "any"
+        ],
+        "description": "How to combine filters. Default 'all'."
       }
     },
     "required": [
