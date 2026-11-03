@@ -5,6 +5,7 @@ import {
   AGGREGATION_MAX_LIMIT,
   NEWEST_FIRST,
   buildAggregationQuery,
+  countTableRecords,
   listTableRecords,
   runTableAggregation,
 } from '../src/server/tools/tableReads.js';
@@ -70,16 +71,36 @@ describe('runTableAggregation truncation (item 4)', () => {
     assert.deepEqual(out.notes, []);
   });
 
-  test('with filters, the matching count comes from a filtered count of id', async () => {
-    const api = fakeApiClient(({ query }) => (query.fieldId === 'id' ? { result: 300 } : { result: 1 }));
+  test('with filters, the matching count comes from a filtered, uncapped /count', async () => {
+    const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/count') ? 250000 : { result: 1 }));
     const out = await runTableAggregation(api, { tableId: 'T1', function: 'max', fieldId: 'qty', limit: 100, filters: OPEN, filterAggregator: 'all' });
     const countCall = api.calls[1];
-    assert.equal(countCall.query.function, 'count');
-    assert.equal(countCall.query.fieldId, 'id');
-    assert.equal(countCall.query.filters, JSON.stringify(OPEN));
-    assert.equal(countCall.query.filterAggregator, 'all');
-    assert.equal(out.matchingRecords, 300);
+    assert.equal(countCall.endpoint, '/tables/T1/count');
+    assert.deepEqual(countCall.query, { filters: JSON.stringify(OPEN), filterAggregator: 'all' });
+    assert.equal(out.matchingRecords, 250000);
+    assert.equal(out.evaluatedRecords, 100);
     assert.equal(out.truncated, true);
+  });
+
+  test('a limit at the API maximum is still reported as truncated on larger tables', async () => {
+    const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/count') ? 250000 : { result: 1 }));
+    const out = await runTableAggregation(api, { tableId: 'T1', function: 'sum', fieldId: 'qty', filters: OPEN });
+    assert.equal(out.truncated, true);
+    assert.match(out.notes[0], /100000 newest of 250000/);
+  });
+});
+
+describe('countTableRecords', () => {
+  test('forwards filters so filtered counts are exact', async () => {
+    const api = fakeApiClient(() => 733);
+    assert.equal(await countTableRecords(api, { tableId: 'T1', filters: OPEN, filterAggregator: 'any' }), 733);
+    assert.deepEqual(api.calls[0].query, { filters: JSON.stringify(OPEN), filterAggregator: 'any' });
+  });
+
+  test('unfiltered count sends no query string', async () => {
+    const api = fakeApiClient(() => 5);
+    await countTableRecords(api, { tableId: 'T1' });
+    assert.equal(api.calls[0].url, 'https://example.tulip.co/api/v3/tables/T1/count');
   });
 });
 
@@ -202,8 +223,9 @@ describe('listTableRecords (item 5)', () => {
   });
 
   test('includeTotalCount reports the filtered total', async () => {
-    const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/runAggregation') ? { result: 733 } : [{ id: '1' }]));
+    const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/count') ? 733 : [{ id: '1' }]));
     const { notes } = await listTableRecords(api, { tableId: 'T1', limit: 1, filters: OPEN, includeTotalCount: true });
     assert.match(notes.at(-1), /733 records match/);
+    assert.equal(api.calls[1].query.filters, JSON.stringify(OPEN));
   });
 });

@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0] - 2026-11-03
 ### Fixed
 - `runTableAggregation` returned HTTP 400 whenever `filters` or `sortOptions` were passed: the arrays were sent as `[object Object]`. Array and object query values are now sent as the single JSON value the Tables API expects, for every tool
 - `runTableAggregation` now supports `min`, `max` and `count` on timestamp fields. The Tables API only allows `uniqueValues` on timestamps, so these are computed from the records endpoint
@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 
 ### Added
 - `listTableRecords` accepts `sortOptions`, `filters`, `filterAggregator`, `fields` and `includeTotalCount`, and pages limits up to 1000 past the API's 100-record maximum
+- `countTableRecords` accepts `filters` and `filterAggregator` (previously any filters were silently ignored and the whole table was counted)
 - `runTableAggregation` `limit` is optional (default 100000)
 - `npm test` runs a regression suite for table reads and query serialization
 

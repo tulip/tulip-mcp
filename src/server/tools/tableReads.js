@@ -100,16 +100,15 @@ export function buildRecordsQuery(args, { limit, offset } = {}) {
 }
 
 /**
- * Count the records that match the given filters (uncapped when unfiltered).
+ * Count the records that match the given filters. GET /count takes the same
+ * filters as /records and, unlike a runAggregation count, is not capped.
  */
-async function countMatching(apiClient, args) {
-  if (parseList(args.filters).length === 0) {
-    return { count: Number(await apiClient.makeRequest(`/tables/${args.tableId}/count`)), capped: false };
-  }
-  const query = { function: 'count', fieldId: 'id', limit: AGGREGATION_MAX_LIMIT, filters: toJsonParam(args.filters, 'filters') };
+export async function countTableRecords(apiClient, args) {
+  const query = {};
+  const filters = toJsonParam(args.filters, 'filters');
+  if (filters) query.filters = filters;
   if (args.filterAggregator) query.filterAggregator = args.filterAggregator;
-  const { result } = await apiClient.makeRequest(`/tables/${args.tableId}/runAggregation`, 'GET', null, query);
-  return { count: result, capped: result >= AGGREGATION_MAX_LIMIT };
+  return Number(await apiClient.makeRequest(`/tables/${args.tableId}/count`, 'GET', null, query));
 }
 
 function isInvalidFieldTypeError(error) {
@@ -188,10 +187,10 @@ export async function runTableAggregation(apiClient, args) {
     return runTimestampAggregation(apiClient, args, query);
   }
 
-  const { count, capped } = await countMatching(apiClient, args);
+  const count = await countTableRecords(apiClient, args);
   const truncated = query.limit < count;
   const meta = {
-    matchingRecords: capped ? `>=${count}` : count,
+    matchingRecords: count,
     evaluatedRecords: Math.min(query.limit, count),
     truncated,
     sortOptions: JSON.parse(query.sortOptions),
@@ -239,8 +238,7 @@ export async function listTableRecords(apiClient, args) {
     notes.push(`Returned ${records.length} records; more may exist. Next page: offset=${offset + records.length}.`);
   }
   if (args.includeTotalCount) {
-    const { count, capped } = await countMatching(apiClient, args);
-    notes.push(`${capped ? 'At least ' : ''}${count} records match in total.`);
+    notes.push(`${await countTableRecords(apiClient, args)} records match in total.`);
   }
   return { records, notes };
 }

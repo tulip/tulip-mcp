@@ -3,7 +3,7 @@
  */
 
 import { logger } from '../utils/Logger.js';
-import { listTableRecords, runTableAggregation } from './tableReads.js';
+import { countTableRecords, listTableRecords, runTableAggregation } from './tableReads.js';
 
 /**
  * Tool handlers class that contains all the business logic for executing tools
@@ -111,7 +111,7 @@ export class ToolHandlers {
           break;
 
         case 'countTableRecords':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/count`);
+          result = await countTableRecords(this.apiClient, args);
           break;
 
         case 'runTableAggregation':
