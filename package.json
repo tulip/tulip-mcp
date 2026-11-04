@@ -1,9 +1,16 @@
 {
   "name": "@tulip/mcp-server",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Model Context Protocol server for Tulip API",
   "main": "src/index.js",
   "type": "module",
+  "files": [
+    "src",
+    "skills",
+    ".claude-plugin",
+    "env.example",
+    "CHANGELOG.md"
+  ],
   "bin": {
     "tulip-mcp": "./src/index.js"
   },
