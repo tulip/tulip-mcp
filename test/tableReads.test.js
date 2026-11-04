@@ -7,6 +7,7 @@ import {
   buildAggregationQuery,
   countTableRecords,
   listTableRecords,
+  normalizeFilters,
   runTableAggregation,
 } from '../src/server/tools/tableReads.js';
 import { coffeeTable, fakeApiClient, httpError, invalidFieldType } from './helpers.js';
@@ -35,8 +36,8 @@ describe('runTableAggregation request shape (bugs 1 and 2)', () => {
     const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/count') ? 3 : { result: 3 }));
     await runTableAggregation(api, { tableId: 'T1', function: 'count', fieldId: 'id', limit: 10, filters: OPEN, sortOptions: NEWEST_FIRST });
     for (const { url } of api.calls) assert.ok(!/object(\+|%20)Object/.test(url), url);
-    assert.equal(api.calls[0].query.filters, JSON.stringify(OPEN));
-    assert.equal(api.calls[0].query.sortOptions, JSON.stringify(NEWEST_FIRST));
+    assert.equal(api.dataCalls[0].query.filters, JSON.stringify(OPEN));
+    assert.equal(api.dataCalls[0].query.sortOptions, JSON.stringify(NEWEST_FIRST));
   });
 
   test('a single sort or filter object is treated as a one-item list', () => {
@@ -84,7 +85,7 @@ describe('runTableAggregation truncation (item 4)', () => {
   test('with filters, the matching count comes from a filtered, uncapped /count', async () => {
     const api = fakeApiClient(({ endpoint }) => (endpoint.endsWith('/count') ? 250000 : { result: 1 }));
     const out = await runTableAggregation(api, { tableId: 'T1', function: 'max', fieldId: 'qty', limit: 100, filters: OPEN, filterAggregator: 'all' });
-    const countCall = api.calls[1];
+    const countCall = api.dataCalls[1];
     assert.equal(countCall.endpoint, '/tables/T1/count');
     assert.deepEqual(countCall.query, { filters: JSON.stringify(OPEN), filterAggregator: 'all' });
     assert.equal(out.matchingRecords, 250000);
@@ -104,7 +105,7 @@ describe('countTableRecords', () => {
   test('forwards filters so filtered counts are exact', async () => {
     const api = fakeApiClient(() => 733);
     assert.equal(await countTableRecords(api, { tableId: 'T1', filters: OPEN, filterAggregator: 'any' }), 733);
-    assert.deepEqual(api.calls[0].query, { filters: JSON.stringify(OPEN), filterAggregator: 'any' });
+    assert.deepEqual(api.dataCalls[0].query, { filters: JSON.stringify(OPEN), filterAggregator: 'any' });
   });
 
   test('unfiltered count sends no query string', async () => {
@@ -192,7 +193,7 @@ describe('listTableRecords (item 5)', () => {
     await listTableRecords(api, {
       tableId: 'T1', limit: 5, offset: 20, sortOptions: NEWEST_FIRST, filters: OPEN, filterAggregator: 'any', fields: ['id', 'status'],
     });
-    assert.deepEqual(api.calls[0].query, {
+    assert.deepEqual(api.dataCalls[0].query, {
       limit: '5',
       offset: '20',
       sortOptions: JSON.stringify(NEWEST_FIRST),
@@ -244,5 +245,84 @@ describe('listTableRecords (item 5)', () => {
     const { notes } = await listTableRecords(api, { tableId: 'T1', limit: 1, filters: OPEN, includeTotalCount: true });
     assert.match(notes.at(-1), /733 records match/);
     assert.equal(api.calls[1].query.filters, JSON.stringify(OPEN));
+  });
+});
+
+describe('filter args are typed from the table columns', () => {
+  const filtersSent = async args => {
+    const api = fakeApiClient(({ endpoint }) => (endpoint === '/tables/T1' ? coffeeTable : 0));
+    await countTableRecords(api, { tableId: 'T1', filters: args });
+    return JSON.parse(api.dataCalls[0].query.filters).map(f => f.arg);
+  };
+
+  test('numeric and boolean text becomes a number or boolean; text and timestamps stay text', async () => {
+    assert.deepEqual(await filtersSent([
+      { field: 'qty', functionType: 'equal', arg: '1' },
+      { field: 'wait', functionType: 'greaterThan', arg: ' 10 ' },
+      { field: 'price', functionType: 'lessThan', arg: '1.5' },
+      { field: '_sequenceNumber', functionType: 'equal', arg: '3' },
+      { field: 'paid', functionType: 'equal', arg: 'TRUE' },
+      { field: 'status', functionType: 'equal', arg: '1' },
+      { field: 'started', functionType: 'greaterThan', arg: '2026-01-01T00:00:00Z' },
+      { field: 'qty', functionType: 'equal', arg: 'abc' },
+    ]), [1, 10, 1.5, 3, true, '1', '2026-01-01T00:00:00Z', 'abc']);
+  });
+
+  test('isIn and notIsIn take a comma list, a JSON array string, an array or a single value', async () => {
+    assert.deepEqual(await filtersSent([
+      { field: 'status', functionType: 'isIn', arg: 'OPEN, DONE' },
+      { field: 'status', functionType: 'isIn', arg: '["a,b","c"]' },
+      { field: 'qty', functionType: 'isIn', arg: '1,2' },
+      { field: 'qty', functionType: 'notIsIn', arg: ['3', 4] },
+      { field: 'qty', functionType: 'notIsIn', arg: 5 },
+    ]), [['OPEN', 'DONE'], ['a,b', 'c'], [1, 2], [3, 4], [5]]);
+  });
+
+  test('the table is not fetched when every arg is already typed', async () => {
+    const api = fakeApiClient(() => 0);
+    await countTableRecords(api, { tableId: 'T1', filters: [{ field: 'qty', functionType: 'equal', arg: 1 }, { field: 'status', functionType: 'notBlank' }] });
+    assert.deepEqual(api.calls.map(c => c.endpoint), ['/tables/T1/count']);
+  });
+
+  test('if the table lookup fails, lists are still split and other args are sent as given', async () => {
+    const args = await normalizeFilters({ filters: [{ field: 'qty', functionType: 'equal', arg: '1' }, { field: 'status', functionType: 'isIn', arg: 'A,B' }] },
+      async () => new Map());
+    assert.deepEqual(args.filters.map(f => f.arg), ['1', ['A', 'B']]);
+  });
+
+  test('listTableRecords and runTableAggregation send typed args too', async () => {
+    const respond = ({ endpoint }) => (endpoint === '/tables/T1' ? coffeeTable : endpoint.endsWith('/count') ? 1 : endpoint.endsWith('/records') ? [] : { result: 1 });
+    const filters = [{ field: 'qty', functionType: 'isIn', arg: '1,2' }];
+    for (const call of [
+      api => listTableRecords(api, { tableId: 'T1', filters }),
+      api => runTableAggregation(api, { tableId: 'T1', function: 'sum', fieldId: 'qty', filters }),
+    ]) {
+      const api = fakeApiClient(respond);
+      await call(api);
+      for (const c of api.dataCalls) assert.equal(c.query.filters, JSON.stringify([{ field: 'qty', functionType: 'isIn', arg: [1, 2] }]));
+      assert.equal(api.calls.filter(c => c.endpoint === '/tables/T1').length, 1);
+    }
+  });
+});
+
+describe('interval aggregations are reported in seconds', () => {
+  const aggregate = (fn, result, fieldId = 'wait') => {
+    const api = fakeApiClient(({ endpoint }) => (endpoint === '/tables/T1' ? coffeeTable : endpoint.endsWith('/count') ? 2 : { result }));
+    return runTableAggregation(api, { tableId: 'T1', function: fn, fieldId });
+  };
+
+  test('value functions on an interval field are divided by 1000, with a note', async () => {
+    const out = await aggregate('max', 15000);
+    assert.equal(out.result, 15);
+    assert.match(out.notes[0], /milliseconds/);
+    assert.deepEqual((await aggregate('uniqueValues', [15000, 7000])).result, [15, 7]);
+    assert.equal((await aggregate('avg', 11000)).result, 11);
+  });
+
+  test('count on an interval field and values on other numeric fields are unchanged', async () => {
+    assert.equal((await aggregate('count', 2)).result, 2);
+    const out = await aggregate('max', 15000, 'qty');
+    assert.equal(out.result, 15000);
+    assert.deepEqual(out.notes, []);
   });
 });

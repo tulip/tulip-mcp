@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Fixed
+- Filters on integer, interval and `_sequenceNumber` columns returned HTTP 422 `ValueIsInvalid` when `arg` was text (e.g. `"1"`). Filter args are now converted to the column's type before sending
+- `isIn` / `notIsIn` filters returned HTTP 400 `InvalidJSON` unless `arg` was a JSON array. A comma list (`"A,B"`), a JSON array string or a single value now work
+- `runTableAggregation` returned interval values in milliseconds while records and filters use seconds. Interval results are now converted to seconds, with a note
+
 ## [1.3.0] - 2026-11-03
 ### Fixed
 - `runTableAggregation` returned HTTP 400 whenever `filters` or `sortOptions` were passed: the arrays were sent as `[object Object]`. Array and object query values are now sent as the single JSON value the Tables API expects, for every tool

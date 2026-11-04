@@ -14,6 +14,12 @@
  *   the records endpoint instead.
  * - Without sortOptions, runAggregation's `limit` keeps the oldest records.
  * - GET /records returns 10 rows by default and at most 100 per request.
+ * - Filter args must match the column type: integer, interval and
+ *   _sequenceNumber reject "1" (422 ValueIsInvalid), and isIn/notIsIn need a
+ *   JSON array ("A,B" is a 400 InvalidJSON). MCP clients send text, so filter
+ *   args are coerced from the table's column types before sending.
+ * - runAggregation returns interval values in milliseconds, while records and
+ *   filters use seconds. Interval results are converted to seconds here.
  */
 
 export const AGGREGATION_MAX_LIMIT = 100000;
@@ -26,6 +32,11 @@ const TIMESTAMP_TYPES = new Set(['timestamp', 'datetime']);
 const TIMESTAMP_FALLBACK_FUNCTIONS = new Set(['min', 'max', 'count']);
 // How far the max fallback scans past blank values when it cannot filter them out
 const MAX_FALLBACK_SCAN_PAGES = 10;
+const NUMERIC_TYPES = new Set(['integer', 'float', 'interval']);
+const LIST_FILTERS = new Set(['isIn', 'notIsIn']);
+const BUILT_IN_TYPES = { _sequenceNumber: 'integer', _createdAt: 'timestamp', _updatedAt: 'timestamp' };
+// runAggregation functions whose result is a field value (not a count)
+const VALUE_FUNCTIONS = new Set(['sum', 'avg', 'min', 'max', 'mode', 'uniqueValues']);
 
 /**
  * Encode a filters/sortOptions/fields argument as the single JSON query value
@@ -58,6 +69,59 @@ function toOptionalInt(value) {
   if (value === undefined || value === null || value === '' || value === 0 || value === '0') return undefined;
   const number = typeof value === 'string' ? Number(value.trim()) : value;
   return Number.isNaN(number) ? value : number;
+}
+
+/**
+ * Column name -> data type for a table, fetched at most once per tool call.
+ * A failed lookup yields no types, so filters are sent as given.
+ */
+function columnTypeLoader(apiClient, tableId) {
+  let pending;
+  return () => {
+    pending ??= apiClient.makeRequest(`/tables/${tableId}`)
+      .then(table => new Map((table?.columns || []).map(c => [c.name, c.dataType?.type])))
+      .catch(() => new Map());
+    return pending;
+  };
+}
+
+function coerceScalar(value, type) {
+  if (typeof value !== 'string') return value;
+  const text = value.trim();
+  if (NUMERIC_TYPES.has(type) && text !== '' && !Number.isNaN(Number(text))) return Number(text);
+  if (type === 'boolean' && /^(true|false)$/i.test(text)) return text.toLowerCase() === 'true';
+  return value;
+}
+
+function coerceFilterArg(filter, type) {
+  let { arg } = filter;
+  if (LIST_FILTERS.has(filter.functionType)) {
+    if (typeof arg === 'string') {
+      const text = arg.trim();
+      let parsed;
+      if (text.startsWith('[')) {
+        try { parsed = JSON.parse(text); } catch { /* fall back to a comma list */ }
+      }
+      arg = Array.isArray(parsed) ? parsed : text.split(',').map(item => item.trim()).filter(item => item !== '');
+    } else if (!Array.isArray(arg)) {
+      arg = [arg];
+    }
+    return { ...filter, arg: arg.map(item => coerceScalar(item, type)) };
+  }
+  return { ...filter, arg: coerceScalar(arg, type) };
+}
+
+/**
+ * Give each filter arg the JSON type its column needs. The table is only
+ * fetched when some arg is text.
+ */
+export async function normalizeFilters(args, loadColumnTypes) {
+  const filters = parseList(args.filters, 'filters');
+  if (!filters.some(f => typeof f?.arg === 'string' || (LIST_FILTERS.has(f?.functionType) && f.arg !== undefined && !Array.isArray(f.arg)))) {
+    return args;
+  }
+  const types = await loadColumnTypes();
+  return { ...args, filters: filters.map(f => (f?.arg === undefined ? f : coerceFilterArg(f, types.get(f.field) ?? BUILT_IN_TYPES[f.field]))) };
 }
 
 function isAnyAggregator(args) {
@@ -114,7 +178,8 @@ export function buildRecordsQuery(args, { limit, offset } = {}) {
  * Count the records that match the given filters. GET /count takes the same
  * filters as /records and, unlike a runAggregation count, is not capped.
  */
-export async function countTableRecords(apiClient, args) {
+export async function countTableRecords(apiClient, rawArgs, loadColumnTypes = columnTypeLoader(apiClient, rawArgs.tableId)) {
+  const args = await normalizeFilters(rawArgs, loadColumnTypes);
   const query = {};
   const filters = toJsonParam(args.filters, 'filters');
   if (filters) query.filters = filters;
@@ -182,7 +247,9 @@ async function runTimestampAggregation(apiClient, args, query) {
  * runTableAggregation with correct serialization, timestamp support and an
  * explicit truncation report.
  */
-export async function runTableAggregation(apiClient, args) {
+export async function runTableAggregation(apiClient, rawArgs) {
+  const loadColumnTypes = columnTypeLoader(apiClient, rawArgs.tableId);
+  const args = await normalizeFilters(rawArgs, loadColumnTypes);
   const { query, sortProvided } = buildAggregationQuery(args);
 
   let response;
@@ -191,14 +258,18 @@ export async function runTableAggregation(apiClient, args) {
     response = { result, notes: [] };
   } catch (error) {
     if (!isInvalidFieldTypeError(error) || !TIMESTAMP_FALLBACK_FUNCTIONS.has(args['function'])) throw error;
-    const table = await apiClient.makeRequest(`/tables/${args.tableId}`);
-    const column = (table.columns || []).find(c => c.name === args.fieldId);
-    const type = column?.dataType?.type;
+    const type = (await loadColumnTypes()).get(args.fieldId);
     if (!TIMESTAMP_TYPES.has(type)) throw error;
     return runTimestampAggregation(apiClient, args, query);
   }
 
-  const count = await countTableRecords(apiClient, args);
+  if (VALUE_FUNCTIONS.has(args['function']) && (await loadColumnTypes()).get(args.fieldId) === 'interval') {
+    const toSeconds = value => (typeof value === 'number' ? value / 1000 : value);
+    response.result = Array.isArray(response.result) ? response.result.map(toSeconds) : toSeconds(response.result);
+    response.notes.push(`"${args.fieldId}" is an interval; the Tables API aggregates intervals in milliseconds, so the result was converted to seconds to match the records endpoint.`);
+  }
+
+  const count = await countTableRecords(apiClient, args, loadColumnTypes);
   const truncated = query.limit < count;
   const meta = {
     matchingRecords: count,
@@ -219,7 +290,8 @@ export async function runTableAggregation(apiClient, args) {
  * API's 100-row page is served by paging with offset, up to LIST_RECORDS_MAX.
  */
 export async function listTableRecords(apiClient, rawArgs) {
-  const args = { ...rawArgs, limit: toOptionalInt(rawArgs.limit) };
+  const loadColumnTypes = columnTypeLoader(apiClient, rawArgs.tableId);
+  const args = { ...(await normalizeFilters(rawArgs, loadColumnTypes)), limit: toOptionalInt(rawArgs.limit) };
   const offset = toOptionalInt(rawArgs.offset) ?? 0;
   if (!Number.isInteger(offset) || offset < 0) {
     throw new Error(`offset must be a non-negative integer (got ${JSON.stringify(rawArgs.offset)})`);
@@ -250,7 +322,7 @@ export async function listTableRecords(apiClient, rawArgs) {
     notes.push(`Returned ${records.length} records; more may exist. Next page: offset=${offset + records.length}.`);
   }
   if (args.includeTotalCount) {
-    notes.push(`${await countTableRecords(apiClient, args)} records match in total.`);
+    notes.push(`${await countTableRecords(apiClient, args, loadColumnTypes)} records match in total.`);
   }
   return { records, notes };
 }

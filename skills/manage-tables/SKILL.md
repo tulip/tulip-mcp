@@ -62,6 +62,8 @@ listTableRecords(tableId="<tableId>", limit=200,
   fields=["id", "<columnId>"], includeTotalCount=true)
 ```
 The API returns 10 records by default and 100 per request; limits up to 1000 are paged for you.
+Filter `arg` values are converted to the column's type, so `"5"` works on integer and interval columns.
+For `isIn`/`notIsIn` pass a comma list (`"A,B"`) or an array. Interval values are in seconds.
 
 **Get a single record:**
 ```
@@ -142,6 +144,7 @@ timestamp fields support `min`, `max`, `count` and `uniqueValues`.
 
 `limit` defaults to 100000. When it is below the number of matching records, the newest records are kept
 (unless `sortOptions` say otherwise) and the result reports `truncated: true`.
+Interval results are returned in seconds, matching the records endpoint (the API itself returns milliseconds).
 
 ---
 
