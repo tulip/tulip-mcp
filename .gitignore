@@ -83,7 +83,7 @@ jspm_packages/
 .fusebox/
 
 # DynamoDB Local files
-.dynamodb/ tools.md
+.dynamodb/
 
 # Generated documentation
 tools.md
