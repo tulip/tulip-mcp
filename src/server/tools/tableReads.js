@@ -20,11 +20,15 @@
  *   args are coerced from the table's column types before sending.
  * - runAggregation returns interval values in milliseconds, while records and
  *   filters use seconds. Interval results are converted to seconds here.
+ * - uniqueValues returns at most 1000 values, without saying so, and is not
+ *   allowed on boolean, image, file or linked-record fields.
  */
 
 export const AGGREGATION_MAX_LIMIT = 100000;
 export const RECORDS_PAGE_MAX = 100;
 export const LIST_RECORDS_MAX = 1000;
+// runAggregation returns at most this many uniqueValues (QueryMaxLimit)
+export const UNIQUE_VALUES_MAX = 1000;
 export const NEWEST_FIRST = [{ sortBy: '_createdAt', sortDir: 'desc' }];
 
 // Column types the records endpoint can sort, used for min/max fallbacks
@@ -267,6 +271,10 @@ export async function runTableAggregation(apiClient, rawArgs) {
     const toSeconds = value => (typeof value === 'number' ? value / 1000 : value);
     response.result = Array.isArray(response.result) ? response.result.map(toSeconds) : toSeconds(response.result);
     response.notes.push(`"${args.fieldId}" is an interval; the Tables API aggregates intervals in milliseconds, so the result was converted to seconds to match the records endpoint.`);
+  }
+
+  if (args['function'] === 'uniqueValues' && Array.isArray(response.result) && response.result.length >= UNIQUE_VALUES_MAX) {
+    response.notes.push(`The Tables API returns at most ${UNIQUE_VALUES_MAX} unique values, so there may be more. Narrow the results with filters.`);
   }
 
   const count = await countTableRecords(apiClient, args, loadColumnTypes);

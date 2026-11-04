@@ -139,8 +139,9 @@ deleteTableAggregation(tableId="<tableId>", aggregationId="<aggregationId>")
 runTableAggregation(tableId="<tableId>", function="sum", fieldId="<columnId>", limit=10000, filters=[...], sortOptions=[...])
 ```
 Valid functions: `sum`, `count`, `avg`, `min`, `max`, `mode`, `uniqueValues`.
-Numeric fields support all of them; text and boolean fields support `count`, `mode` and `uniqueValues`;
-timestamp fields support `min`, `max`, `count` and `uniqueValues`.
+Numeric fields support all of them; text fields support `count`, `mode` and `uniqueValues`;
+boolean fields support `count` and `mode`; timestamp fields support `min`, `max`, `count` and `uniqueValues`.
+Image, file and linked-record fields cannot be aggregated. `uniqueValues` returns at most 1000 values.
 
 `limit` defaults to 100000. When it is below the number of matching records, the newest records are kept
 (unless `sortOptions` say otherwise) and the result reports `truncated: true`.
