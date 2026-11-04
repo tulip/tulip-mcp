@@ -27,11 +27,12 @@ The `.env` file requires these values:
 | `TULIP_API_KEY` | Yes | API key from your Tulip instance |
 | `TULIP_API_SECRET` | Yes | Corresponding API secret |
 | `TULIP_BASE_URL` | Yes | Your instance URL, e.g. `https://your-instance.tulip.co` |
-| `TULIP_WORKSPACE_ID` | Account keys only | Usually `DEFAULT` — not needed for Workspace API keys |
+| `TULIP_WORKSPACE_ID` | Account keys | Usually `DEFAULT`. Station and interface tools use it with any key type (default `DEFAULT`) |
 
 API keys are created in your Tulip instance under **Settings → API Keys**. Workspace
-API keys (an enterprise feature) do not require `TULIP_WORKSPACE_ID`. Account API
-keys do.
+API keys (an enterprise feature) do not need `TULIP_WORKSPACE_ID` for table and user
+tools; if the key's workspace is not `DEFAULT`, set it so station and interface tools
+reach the right workspace. Account API keys always need it.
 
 ## Prerequisite: the user needs an .env file
 

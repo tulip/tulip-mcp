@@ -6,12 +6,11 @@
     "properties": {
       "interfaceId": {
         "type": "string",
-        "description": "The ID of the interface to archive"
+        "description": "The ID of the interface to archive",
+        "minLength": 1
       }
     },
-    "required": [
-      "interfaceId"
-    ]
+    "required": ["interfaceId"]
   },
   "category": "admin",
   "type": "interface",

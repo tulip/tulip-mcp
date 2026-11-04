@@ -6,7 +6,8 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table to count records in"
+        "description": "The ID of the table to count records in",
+        "minLength": 1
       },
       "filters": {
         "type": "array",
@@ -19,24 +20,7 @@
             },
             "functionType": {
               "type": "string",
-              "enum": [
-                "equal",
-                "notEqual",
-                "blank",
-                "notBlank",
-                "greaterThan",
-                "greaterThanOrEqual",
-                "lessThan",
-                "lessThanOrEqual",
-                "contains",
-                "notContains",
-                "startsWith",
-                "notStartsWith",
-                "endsWith",
-                "notEndsWith",
-                "isIn",
-                "notIsIn"
-              ],
+              "enum": ["equal", "notEqual", "blank", "notBlank", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual", "contains", "notContains", "startsWith", "notStartsWith", "endsWith", "notEndsWith", "isIn", "notIsIn"],
               "description": "Comparison function."
             },
             "arg": {
@@ -44,25 +28,17 @@
               "description": "Value to compare to. Omit for 'blank' and 'notBlank'. Numbers and booleans may be sent as text; they are converted to the column's type. For isIn/notIsIn give a comma list (\"A,B\") or a JSON array. Interval values are in seconds. For timestamps use an ISO 8601 string."
             }
           },
-          "required": [
-            "field",
-            "functionType"
-          ]
+          "required": ["field", "functionType"]
         },
         "description": "Only count records matching these filters. Example: [{\"field\":\"status\",\"functionType\":\"equal\",\"arg\":\"OPEN\"}]"
       },
       "filterAggregator": {
         "type": "string",
-        "enum": [
-          "all",
-          "any"
-        ],
+        "enum": ["all", "any"],
         "description": "How to combine filters. Default 'all'."
       }
     },
-    "required": [
-      "tableId"
-    ]
+    "required": ["tableId"]
   },
   "category": "read-only",
   "type": "table",

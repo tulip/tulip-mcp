@@ -65,9 +65,9 @@ Station groups let you push app assignments to many stations at once.
 createStationGroup(stationGroupData={ name: "Assembly Line 1" })
 ```
 
-**Add stations to a group:**
+**Add or remove stations in a group:**
 ```
-updateStationGroupStations(stationGroupId="<id>", stationIds=["<id1>", "<id2>"])
+updateStationGroupStations(stationGroupId="<id>", add=["<id1>", "<id2>"], remove=["<id3>"])
 ```
 
 **Update group settings:**
@@ -103,7 +103,7 @@ listStationAppAssignments(stationId="<id>")
 
 **Update an existing assignment:**
 ```
-manageStationAppAssignment(stationId="<id>", appAssignmentId="<id>", type="...", tag="prod")
+manageStationAppAssignment(stationId="<id>", appAssignmentId="<id>", type="app", appId="<appId>", tag="latest-published")
 ```
 
 **Remove a single assignment:**
@@ -129,7 +129,7 @@ listStationGroupAppAssignments(stationGroupId="<id>")
 
 **Update a group assignment:**
 ```
-manageStationGroupAppAssignment(stationGroupId="<id>", appAssignmentId="<id>", type="...", tag="prod")
+manageStationGroupAppAssignment(stationGroupId="<id>", appAssignmentId="<id>", type="app", appId="<appId>", tag="latest-published")
 ```
 
 **Remove a group assignment:**
@@ -206,7 +206,7 @@ The `tag` field on an app assignment controls which version of the app runs:
 | `getStationGroup` | Get group details |
 | `createStationGroup` | Create a station group |
 | `updateStationGroup` | Update group config |
-| `updateStationGroupStations` | Set which stations are in a group |
+| `updateStationGroupStations` | Add or remove stations in a group |
 | `archiveStationGroup` | Archive a station group |
 | `createStationAppAssignment` | Assign an app to a station |
 | `listStationAppAssignments` | List app assignments on a station |

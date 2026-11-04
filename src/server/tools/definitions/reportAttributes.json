@@ -1,17 +1,34 @@
 {
   "name": "reportAttributes",
-  "description": "Reports new values for machine attributes. Corresponds to POST /attributes/report. Requires `attributes:write` scope. [WRITE]",
+  "description": "Reports machine attribute values. Corresponds to POST /attributes/report. Requires `attributes:report` scope. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "attributes": {
-        "type": "object",
-        "description": "Attribute values to report"
+        "type": "array",
+        "description": "Attribute values to report.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "machineId": {
+              "type": "string",
+              "description": "Machine ID.",
+              "minLength": 1
+            },
+            "attributeId": {
+              "type": "string",
+              "description": "Attribute ID.",
+              "minLength": 1
+            },
+            "value": {
+              "description": "Value to report: a string, number or boolean matching the attribute type."
+            }
+          },
+          "required": ["machineId", "attributeId", "value"]
+        }
       }
     },
-    "required": [
-      "attributes"
-    ]
+    "required": ["attributes"]
   },
   "category": "write",
   "type": "machine",

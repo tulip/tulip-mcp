@@ -9,6 +9,12 @@ import { logger } from '../utils/Logger.js';
 
 const { version: packageVersion } = createRequire(import.meta.url)('../../../package.json');
 
+// A non-negative number from the environment; 0 is a valid value (e.g. no retries)
+function readNumber(name, fallback) {
+  const value = Number(process.env[name]);
+  return process.env[name] !== undefined && process.env[name] !== '' && Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+
 /**
  * Environment configuration class that handles all environment variable loading and validation
  */
@@ -54,9 +60,10 @@ export class Environment {
     this.serverVersion = process.env.MCP_SERVER_VERSION || packageVersion;
 
     // Rate limiting configuration
-    this.maxRetries = parseInt(process.env.MCP_MAX_RETRIES) || 3;
-    this.baseDelay = parseInt(process.env.MCP_BASE_DELAY) || 1000;
-    this.maxDelay = parseInt(process.env.MCP_MAX_DELAY) || 30000;
+    this.maxRetries = readNumber('MCP_MAX_RETRIES', 3);
+    this.baseDelay = readNumber('MCP_BASE_DELAY', 1000);
+    this.maxDelay = readNumber('MCP_MAX_DELAY', 30000);
+    this.timeoutMs = readNumber('MCP_REQUEST_TIMEOUT', 60000);
 
     // Tool selection configuration
     this.enabledTools = process.env.ENABLED_TOOLS;
@@ -116,6 +123,7 @@ export class Environment {
       maxRetries: this.maxRetries,
       baseDelay: this.baseDelay,
       maxDelay: this.maxDelay,
+      timeoutMs: this.timeoutMs,
     };
   }
 

@@ -6,18 +6,19 @@
     "properties": {
       "interfaceId": {
         "type": "string",
-        "description": "The unique identifier for an interface."
+        "description": "The unique identifier for an interface.",
+        "minLength": 1
       },
       "replaceInterfaceAtStation": {
         "type": "boolean",
-        "description": "If set to true, indicates that if there is already an interface assigned to the station it will be replaced."
+        "description": "Replace the interface already at that station, if any. Without it, assigning to an occupied station fails with 409."
       },
       "stationId": {
         "type": "string",
         "description": "The ID of the station to assign the interface to"
       }
     },
-    "required": ["interfaceId"]
+    "required": ["interfaceId", "stationId"]
   },
   "category": "write",
   "type": "interface",

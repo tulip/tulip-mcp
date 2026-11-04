@@ -1,65 +1,88 @@
 {
   "name": "updateTableQuery",
-  "description": "Updates a query in a Tulip Table by the query id. Corresponds to PUT /tables/{tableId}/query/{queryId}. Requires `tables:write` scope. [WRITE]",
+  "description": "Updates a query in a Tulip Table by the query id. Corresponds to PUT /tables/{tableId}/query/{queryId}. Requires `table-queries:write` scope. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "queryId": {
         "type": "string",
-        "description": "The ID of the query to update."
+        "description": "The ID of the query to update.",
+        "minLength": 1
       },
       "tableId": {
         "type": "string",
-        "description": "The ID of the Tulip Table that the query is being created on."
+        "description": "The ID of the Tulip Table that the query is being created on.",
+        "minLength": 1
       },
       "label": {
         "type": "string",
-        "description": "The display label for the query."
+        "description": "Display label (1-40 characters).",
+        "minLength": 1,
+        "maxLength": 40
       },
       "filters": {
         "type": "array",
-        "description": "An array of filter objects that define the conditions for the query. Each filter object should contain a field, functionType, and value.",
+        "description": "Filter conditions. Note saved queries use value:{datasourceType,params:{value}}, not the `arg` used by listTableRecords.",
         "items": {
           "type": "object",
           "properties": {
             "_id": {
               "type": "string",
-              "description": "The internal ID for the filter"
+              "description": "Filter ID; generated if omitted."
             },
             "field": {
               "type": "string",
-              "description": "The field to filter on"
+              "description": "Column name (getTable .columns[].name) or _createdAt/_updatedAt."
             },
             "functionType": {
               "type": "string",
-              "description": "The function type for the filter"
+              "description": "Comparison function.",
+              "enum": ["equal", "notEqual", "blank", "notBlank", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual", "contains", "notContains", "startsWith", "notStartsWith", "endsWith", "notEndsWith", "isIn", "notIsIn"]
             },
             "value": {
               "type": "object",
-              "description": "The actual value to compare against the field."
+              "description": "Value to compare to; omit for blank/notBlank. {\"datasourceType\":\"static\",\"params\":{\"value\":<value of the column's type>}}.",
+              "properties": {
+                "datasourceType": {
+                  "type": "string",
+                  "description": "\"static\" for a fixed value.",
+                  "enum": ["static"]
+                },
+                "params": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "description": "The value, as the column's type (string, number or boolean)."
+                    }
+                  },
+                  "required": ["value"]
+                }
+              },
+              "required": ["datasourceType", "params"]
             }
           },
-          "required": ["field", "functionType", "value", "_id"]
+          "required": ["field", "functionType"]
         }
       },
-    
       "filterAggregator": {
         "type": "string",
-        "description": "The aggregator of all filters defined on the query."
+        "description": "How to combine filters (default \"all\").",
+        "enum": ["all", "any"]
       },
       "sortOptions": {
         "type": "array",
-        "description": "An array of sort options that define how the records should be sorted. Each sort option should contain a field and direction.",
+        "description": "Sort order, in priority order.",
         "items": {
           "type": "object",
           "properties": {
-           "sortBy": {
+            "sortBy": {
               "type": "string",
-              "description": "The field that records should be sorted by in the response. Can be the name of any of the columns of the Table (including id) or one of these special values:"
+              "description": "Column name or _createdAt/_updatedAt."
             },
             "sortDir": {
               "type": "string",
-              "description": "The direction of the records, asc or desc"
+              "description": "Sort direction.",
+              "enum": ["asc", "desc"]
             }
           },
           "required": ["sortBy", "sortDir"]
@@ -67,10 +90,12 @@
       },
       "limit": {
         "type": "integer",
-        "description": "The number of records that the query returns."
+        "description": "Maximum number of records the query returns (1-1000).",
+        "minimum": 1,
+        "maximum": 1000
       }
     },
-    "required": ["tableId", "queryId", "label", "filters", "filterAggregator", "sortOptions", "limit"]
+    "required": ["tableId", "queryId", "label", "limit"]
   },
   "category": "write",
   "type": "table",

@@ -1,9 +1,25 @@
 {
   "name": "listTables",
-  "description": "Retrieves a list of all Tulip Tables. Corresponds to GET /tables. Requires `tables:read` scope. [READ-ONLY]",
+  "description": "Lists Tulip Tables with their column definitions. Corresponds to GET /tables. Requires `tables:read` scope. Use limit/offset on instances with many tables. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
-    "properties": {},
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of tables to return (1-100).",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Number of tables to skip.",
+        "minimum": 0
+      },
+      "includeDeleted": {
+        "type": "boolean",
+        "description": "Include deleted tables."
+      }
+    },
     "required": []
   },
   "category": "read-only",

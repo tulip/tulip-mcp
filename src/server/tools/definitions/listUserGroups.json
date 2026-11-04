@@ -3,7 +3,20 @@
   "description": "Gets a list of user groups. Corresponds to GET /api/users/v1/user-groups. Requires `users:read` scope. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
-    "properties": {},
+    "properties": {
+      "search": {
+        "type": "string",
+        "description": "Text search."
+      },
+      "filter": {
+        "type": "string",
+        "description": "OData filter on id with eq and or, e.g. id eq '<id1>' or id eq '<id2>'."
+      },
+      "archived": {
+        "type": "boolean",
+        "description": "List deactivated items instead of active ones."
+      }
+    },
     "required": []
   },
   "category": "read-only",

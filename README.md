@@ -22,9 +22,9 @@ Create a file named `.env` in a folder of your choice. Copy and paste the follow
 TULIP_API_KEY=your_api_key_here
 TULIP_API_SECRET=your_api_secret_here
 TULIP_BASE_URL=https://your-instance.tulip.co
-TULIP_WORKSPACE_ID=your_workspace_id_here_if_using_account_api_key
+TULIP_WORKSPACE_ID=DEFAULT
 ```
-⚠️ **Important**: The `TULIP_WORKSPACE_ID` is only required if you are using an Account API key (obtained from Account Settings). If you are using a Workspace API key (obtained from Workspace Settings), you can leave this field empty.
+⚠️ **Important**: The `TULIP_WORKSPACE_ID` is required if you are using an Account API key (obtained from Account Settings). With a Workspace API key (obtained from Workspace Settings) you can leave it unset; station and interface tools then use the `DEFAULT` workspace, so set it if your key belongs to a different workspace.
 
 ### 2. Run the Server
 
@@ -120,7 +120,7 @@ The `ENABLED_TOOLS` variable accepts a comma-separated list that can include:
 
 -   **Individual tool names**: Specific tools like `listStations`
 -   **Categories**: Security-based groupings (`read-only`, `write`, `admin`)
--   **Types**: Resource-based groupings (`table`, `machine`, `user`, `app`, `interface`, `station`, `station-group`, `utility`)
+-   **Types**: Resource-based groupings (`table`, `machine`, `user`, `app`, `interface`, `station`, `station-group`, `utility`). A type enables that resource's read and write tools but never its `admin` tools (deletes, archives, user creation); enable those with the `admin` category or by tool name.
 
 #### Examples
 
@@ -231,7 +231,7 @@ For detailed tool documentation including complete parameter lists, examples, an
 2.  Navigate to **Settings** > **API Tokens**.
 3.  Create a new API token. Give it a name (e.g., "MCP Server").
 4.  Make sure to grant it the necessary permissions (scopes). A good starting set for read-only access is:
-    `stations:read,users:read,tables:read,machines:read,apps:read,urls:sign`
+    `stations:read,users:read,tables:read,table-queries:read,machines:read,apps:read,urls:sign`
 5.  Copy the **API Key** and **Secret** and paste them into your `.env` file.
 
-⚠️ **Important**: The `TULIP_WORKSPACE_ID` is only required if you are using an Account API key (obtained from Account Settings). If you are using a Workspace API key (obtained from Workspace Settings), you can leave this field empty.
+⚠️ **Important**: The `TULIP_WORKSPACE_ID` is required if you are using an Account API key (obtained from Account Settings). With a Workspace API key (obtained from Workspace Settings) you can leave it unset; station and interface tools then use the `DEFAULT` workspace, so set it if your key belongs to a different workspace.

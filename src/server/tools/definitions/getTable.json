@@ -6,12 +6,11 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table to retrieve"
+        "description": "The ID of the table to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "tableId"
-    ]
+    "required": ["tableId"]
   },
   "category": "read-only",
   "type": "table",

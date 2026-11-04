@@ -6,17 +6,26 @@
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The ID of the station group to update"
+        "description": "The ID of the station group to update",
+        "minLength": 1
       },
       "stationGroupData": {
         "type": "object",
-        "description": "Updated station group data"
+        "description": "Station group fields.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Station group name.",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Description."
+          }
+        }
       }
     },
-    "required": [
-      "stationGroupId",
-      "stationGroupData"
-    ]
+    "required": ["stationGroupId", "stationGroupData"]
   },
   "category": "write",
   "type": "station-group",

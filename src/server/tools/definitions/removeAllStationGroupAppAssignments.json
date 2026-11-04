@@ -6,13 +6,14 @@
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The id of the station group."
+        "description": "The id of the station group.",
+        "minLength": 1
       }
     },
     "required": ["stationGroupId"]
   },
   "category": "admin",
-  "type": "app",
+  "type": "station-group",
   "dangerous": true,
   "httpType": "DELETE",
   "url": "/api/stations/v1/station-groups/:stationGroupId/app-assignments"

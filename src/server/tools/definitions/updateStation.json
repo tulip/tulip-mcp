@@ -6,17 +6,30 @@
     "properties": {
       "stationId": {
         "type": "string",
-        "description": "The ID of the station to update"
+        "description": "The ID of the station to update",
+        "minLength": 1
       },
       "stationData": {
         "type": "object",
-        "description": "Updated station data"
+        "description": "Station fields.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Station name.",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Description."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone, e.g. America/New_York."
+          }
+        }
       }
     },
-    "required": [
-      "stationId",
-      "stationData"
-    ]
+    "required": ["stationId", "stationData"]
   },
   "category": "write",
   "type": "station",

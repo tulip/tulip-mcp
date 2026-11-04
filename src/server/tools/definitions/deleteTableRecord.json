@@ -1,22 +1,21 @@
 {
   "name": "deleteTableRecord",
-  "description": "[DANGEROUS OPERATION] Deletes a specific record from a Tulip Table permanently. This action cannot be undone. Corresponds to DELETE /tables/{tableId}/records/{recordId}. Requires `tables:write` scope. [ADMIN]",
+  "description": "[DANGEROUS OPERATION] Deletes a specific record from a Tulip Table permanently. This action cannot be undone. Corresponds to DELETE /tables/{tableId}/records/{recordId}. Requires `tables:write` scope. Returns the deleted record; \"No record found\" means nothing with that id existed. [ADMIN]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table"
+        "description": "The ID of the table",
+        "minLength": 1
       },
       "recordId": {
         "type": "string",
-        "description": "The ID of the record to delete"
+        "description": "The ID of the record to delete",
+        "minLength": 1
       }
     },
-    "required": [
-      "tableId",
-      "recordId"
-    ]
+    "required": ["tableId", "recordId"]
   },
   "category": "admin",
   "type": "table",

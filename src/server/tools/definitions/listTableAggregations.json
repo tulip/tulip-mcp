@@ -1,12 +1,22 @@
 {
   "name": "listTableAggregations",
-  "description": "Lists the aggregations for a Tulip Table. Corresponds to GET /tables/{tableId}/aggregations. Requires `tables:read` scope. [READ-ONLY]",
+  "description": "Lists the aggregations for a Tulip Table. Corresponds to GET /tables/{tableId}/aggregations. Requires `table-queries:read` scope. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The id of a Tulip Table."
+        "description": "The id of a Tulip Table.",
+        "minLength": 1
+      },
+      "field": {
+        "type": "string",
+        "description": "Only aggregations on this column."
+      },
+      "fn": {
+        "type": "string",
+        "description": "Only aggregations using this function.",
+        "enum": ["sum", "count", "avg", "min", "max", "mode", "uniqueValues"]
       }
     },
     "required": ["tableId"]

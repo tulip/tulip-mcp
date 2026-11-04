@@ -1,6 +1,6 @@
 {
   "name": "signUrls",
-  "description": "Signs cloud storage URLs. Corresponds to POST /signURLs. Requires appropriate scope. [WRITE]",
+  "description": "Signs Tulip file URLs (e.g. imageUrl/fileUrl values) so they can be downloaded. Corresponds to POST /signURLs. Requires `urls:sign` scope. Returns {signedURLs} in input order, null for URLs that cannot be signed; signed URLs are valid for 3 hours. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
@@ -12,9 +12,7 @@
         }
       }
     },
-    "required": [
-      "urls"
-    ]
+    "required": ["urls"]
   },
   "category": "write",
   "type": "utility",

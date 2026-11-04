@@ -6,12 +6,11 @@
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The ID of the station group to archive"
+        "description": "The ID of the station group to archive",
+        "minLength": 1
       }
     },
-    "required": [
-      "stationGroupId"
-    ]
+    "required": ["stationGroupId"]
   },
   "category": "admin",
   "type": "station-group",

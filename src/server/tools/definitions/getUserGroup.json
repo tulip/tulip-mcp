@@ -6,12 +6,11 @@
     "properties": {
       "userGroupId": {
         "type": "string",
-        "description": "The ID of the user group to retrieve"
+        "description": "The ID of the user group to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "userGroupId"
-    ]
+    "required": ["userGroupId"]
   },
   "category": "read-only",
   "type": "user",

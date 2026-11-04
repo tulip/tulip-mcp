@@ -6,22 +6,20 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table"
+        "description": "The ID of the table",
+        "minLength": 1
       },
       "recordId": {
         "type": "string",
-        "description": "The ID of the record to update"
+        "description": "The ID of the record to update",
+        "minLength": 1
       },
       "recordData": {
         "type": "object",
-        "description": "Updated record data"
+        "description": "Field values keyed by column name (getTable .columns[].name, not labels). The record id cannot be changed."
       }
     },
-    "required": [
-      "tableId",
-      "recordId",
-      "recordData"
-    ]
+    "required": ["tableId", "recordId", "recordData"]
   },
   "category": "write",
   "type": "table",

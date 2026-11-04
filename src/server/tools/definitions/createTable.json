@@ -1,17 +1,71 @@
 {
   "name": "createTable",
-  "description": "Creates a new Tulip Table. Corresponds to POST /tables. Requires `tables:write` scope. [WRITE]",
+  "description": "Creates a new Tulip Table. Corresponds to POST /tables. Requires `tables:write` scope. Include an `id` column ({\"name\":\"id\",\"label\":\"ID\",\"description\":\"\",\"dataType\":{\"type\":\"string\"},\"hidden\":false,\"unique\":true}); every other column must have unique:false. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableData": {
         "type": "object",
-        "description": "Table data for creating new table"
+        "description": "The table to create.",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Table name (1-255 characters).",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "description": "Table description; may be \"\"."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Column definitions.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Column ID: starts with a letter, then letters, digits or underscores (max 50).",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                  "maxLength": 50
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Display label."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Column description; may be \"\"."
+                },
+                "dataType": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "Column data type.",
+                      "enum": ["string", "integer", "float", "boolean", "timestamp", "interval", "user", "imageUrl", "color"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                "hidden": {
+                  "type": "boolean",
+                  "description": "Hide the column in the Tables UI."
+                },
+                "unique": {
+                  "type": "boolean",
+                  "description": "Must be false for every column except id."
+                }
+              },
+              "required": ["name", "label", "description", "dataType", "hidden", "unique"]
+            }
+          }
+        },
+        "required": ["label", "description", "columns"]
       }
     },
-    "required": [
-      "tableData"
-    ]
+    "required": ["tableData"]
   },
   "category": "write",
   "type": "table",

@@ -6,19 +6,23 @@
     "properties": {
       "userId": {
         "type": "string",
-        "description": "The ID of the user to retrieve the assigned user groups."
+        "description": "The ID of the user to retrieve the assigned user groups.",
+        "minLength": 1
       },
       "limit": {
         "type": "integer",
-        "description": "The number of items to return in the response."
+        "description": "The number of items to return in the response.",
+        "minimum": 0,
+        "maximum": 200
       },
       "offset": {
         "type": "integer",
-        "description": "The number of items to skip before collecting the result."
+        "description": "The number of items to skip before collecting the result.",
+        "minimum": 0
       },
       "filter": {
         "type": "string",
-        "description": "Filters the result using OData 4.01 syntax. Supports filtering on the userGroupId field. Only supports the eq and or operators."
+        "description": "OData-style filter with single-quoted values, e.g. userGroupId eq '<id>' or userGroupId eq '<id2>'."
       }
     },
     "required": ["userId"]

@@ -3,7 +3,43 @@
  */
 
 import { logger } from '../utils/Logger.js';
+import { randomBytes } from 'crypto';
+
+import { pathSegment } from '../networking/ApiClient.js';
 import { countTableRecords, listTableRecords, runTableAggregation } from './tableReads.js';
+
+const LIST_PARAMS = ['limit', 'offset', 'sort', 'filter', 'search', 'archived'];
+const ASSIGNMENT_FIELDS = ['type', 'tag', 'appFolderId', 'appId', 'appVersionId'];
+
+// A random ID in the 17-character form Tulip uses
+function randomId() {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz';
+  return Array.from(randomBytes(17), byte => chars[byte % chars.length]).join('');
+}
+
+// The given keys of args that are set
+function pick(args, keys) {
+  return Object.fromEntries(keys.filter(key => args[key] !== undefined && args[key] !== null && args[key] !== '').map(key => [key, args[key]]));
+}
+
+// Reject a call that is missing required arguments before anything is sent
+function checkRequired(definition, args) {
+  const missing = (definition?.inputSchema?.required || []).filter(key => args[key] === undefined || args[key] === null || args[key] === '');
+  if (missing.length) throw new Error(`Missing required argument(s): ${missing.join(', ')}`);
+}
+
+// Saved table query body. tableId must also be in the body and match the path,
+// and the API requires an _id on every filter, so one is generated if missing.
+function queryBody(args) {
+  return {
+    label: args.label,
+    tableId: args.tableId,
+    filters: (args.filters || []).map(filter => ({ _id: randomId(), ...filter })),
+    filterAggregator: args.filterAggregator || 'all',
+    sortOptions: args.sortOptions || [],
+    limit: args.limit,
+  };
+}
 
 /**
  * Tool handlers class that contains all the business logic for executing tools
@@ -15,13 +51,17 @@ export class ToolHandlers {
   }
 
   async handleToolCall(name, args) {
+    if (!this.toolSelection.isValidTool(name)) {
+      return { content: [{ type: 'text', text: `Unknown tool '${name}'.` }], isError: true };
+    }
+
     // Check if tool is enabled
     if (!this.toolSelection.isToolEnabled(name)) {
       return {
         content: [
           {
             type: 'text',
-            text: `Tool '${name}' is not enabled.\n\nCurrent Configuration:\n  Categories: ${Array.from(this.toolSelection.getEnabledToolCategories()).join(', ') || 'none'}\n  Types: ${Array.from(this.toolSelection.getEnabledToolTypes()).join(', ') || 'none'}\n\nTool Information:\n  Category: ${this.toolSelection.getToolCategory(name)}\n  Type: ${this.toolSelection.getToolType(name)}\n\nTo enable this tool, set ENABLED_TOOLS with one of:\n  1. Individual tool: ENABLED_TOOLS=${name}\n  2. By category: ENABLED_TOOLS=${this.toolSelection.getToolCategory(name)}\n  3. By type: ENABLED_TOOLS=${this.toolSelection.getToolType(name)}\n  4. Combined: ENABLED_TOOLS=table,read-only,${name}\n\nAvailable categories: ${this.toolSelection.getAvailableToolCategories().join(', ')}\nAvailable types: ${this.toolSelection.getAvailableToolTypes().join(', ')}`,
+            text: `Tool '${name}' is not enabled.\n\nCurrent Configuration:\n  Categories: ${Array.from(this.toolSelection.getEnabledToolCategories()).join(', ') || 'none'}\n  Types: ${Array.from(this.toolSelection.getEnabledToolTypes()).join(', ') || 'none'}\n\nTool Information:\n  Category: ${this.toolSelection.getToolCategory(name)}\n  Type: ${this.toolSelection.getToolType(name)}\n\nTo enable this tool, set ENABLED_TOOLS with one of:\n  1. Individual tool: ENABLED_TOOLS=${name}\n  2. By category: ENABLED_TOOLS=${this.toolSelection.getToolCategory(name)}\n  3. By type: ENABLED_TOOLS=${this.toolSelection.getToolType(name)} (types do not include admin tools)\n  4. Combined: ENABLED_TOOLS=table,read-only,${name}\n\nAvailable categories: ${this.toolSelection.getAvailableToolCategories().join(', ')}\nAvailable types: ${this.toolSelection.getAvailableToolTypes().join(', ')}`,
           },
         ],
         isError: true,
@@ -34,127 +74,114 @@ export class ToolHandlers {
     }
 
     try {
+      checkRequired(this.toolSelection.toolDefinitions?.getToolDefinition?.(name), args);
       let result;
       // Caveats a read tool wants the caller to see (e.g. truncation)
       let notes = [];
       
+      const api = this.apiClient;
+      // Encoded, validated path segment for an ID argument
+      const id = key => pathSegment(args[key], key);
+      const stations = path => api.createNextGenApiUrl(path);
+      const users = path => api.createNextGenUsersApiUrl(path);
+
       switch (name) {
         case 'listAppGroups':
-          result = await this.apiClient.makeRequest('/appGroups');
+          result = await api.makeRequest('/appGroups');
           break;
 
         case 'listMachineTypes':
-          result = await this.apiClient.makeRequest('/machines');
+          result = await api.makeRequest('/machines');
           break;
 
         case 'generateMachineActivityArchive':
-          result = await this.apiClient.makeRequest(`/machines/archive/${args.machineId}`, 'POST');
+          result = await api.makeRequest(`/machines/archive/${id('machineId')}`, 'POST');
           break;
 
         case 'retrieveMachineActivityArchive':
-          result = await this.apiClient.makeRequest(`/machines/archive/csv/${args.jobId}`);
+          result = await api.makeRequest(`/machines/archive/csv/${id('jobId')}`);
           break;
 
         case 'reportAttributes':
-          result = await this.apiClient.makeRequest('/attributes/report', 'POST', args.attributes);
+          result = await api.makeRequest('/attributes/report', 'POST', { attributes: args.attributes });
           break;
 
         case 'createUser':
-          const userData = {
-            role: args.role,
-            name: args.name
-          };
-          if (args.badge_id) {
-            userData.badge_id = args.badge_id;
-          }
-          result = await this.apiClient.makeRequest('/users', 'POST', userData);
+          result = await api.makeRequest('/users', 'POST', pick(args, ['role', 'name', 'badge_id']));
           break;
 
         case 'listTables':
-          result = await this.apiClient.makeRequest('/tables');
+          result = await api.makeRequest('/tables', 'GET', null, pick(args, ['limit', 'offset', 'includeDeleted']));
           break;
 
         case 'createTable':
-          result = await this.apiClient.makeRequest('/tables', 'POST', args.tableData);
+          result = await api.makeRequest('/tables', 'POST', args.tableData);
           break;
 
         case 'getTable':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}`);
+          result = await api.makeRequest(`/tables/${id('tableId')}`);
           break;
 
         case 'updateTable':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}`, 'PUT', args.tableData);
+          result = await api.makeRequest(`/tables/${id('tableId')}`, 'PUT', args.tableData);
           break;
 
         case 'listTableRecords':
-          ({ records: result, notes } = await listTableRecords(this.apiClient, args));
+          ({ records: result, notes } = await listTableRecords(api, args));
           break;
 
         case 'createTableRecord':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records`, 'POST', args.recordData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/records`, 'POST', args.recordData);
           break;
 
         case 'getTableRecord':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records/${args.recordId}`);
+          result = await api.makeRequest(`/tables/${id('tableId')}/records/${id('recordId')}`, 'GET', null, pick(args, ['fields']));
           break;
 
         case 'updateTableRecord':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records/${args.recordId}`, 'PUT', args.recordData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/records/${id('recordId')}`, 'PUT', args.recordData);
           break;
 
         case 'deleteTableRecord':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records/${args.recordId}`, 'DELETE');
+          result = await api.makeRequest(`/tables/${id('tableId')}/records/${id('recordId')}`, 'DELETE');
+          // The API answers 204 with no body when no record has that ID
+          if (result === '') result = `No record found with id ${JSON.stringify(args.recordId)}; nothing was deleted.`;
           break;
 
         case 'deleteAllTableRecords':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records`, 'DELETE');
+          result = await api.makeRequest(`/tables/${id('tableId')}/records`, 'DELETE', null, pick(args, ['allowRecordsInUse']));
           break;
 
         case 'countTableRecords':
-          result = await countTableRecords(this.apiClient, args);
+          result = await countTableRecords(api, args);
           break;
 
         case 'runTableAggregation':
-          ({ notes, ...result } = await runTableAggregation(this.apiClient, args));
+          ({ notes, ...result } = await runTableAggregation(api, args));
           break;
 
         case 'incrementTableRecordField':
-          const incrementData = {
-            fieldName: args.fieldName,
-            value: args.value
-          };
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/records/${args.recordId}/increment`, 'PATCH', incrementData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/records/${id('recordId')}/increment`, 'PATCH', pick(args, ['fieldName', 'value']));
           break;
 
         case 'createTableLink':
-          result = await this.apiClient.makeRequest('/tableLinks', 'POST', args.linkData);
+          result = await api.makeRequest('/tableLinks', 'POST', args.linkData);
           break;
 
         case 'getTableLink':
-          result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}`);
+          result = await api.makeRequest(`/tableLinks/${id('tableLinkId')}`);
           break;
 
         case 'updateTableLinkLabels':
-           const updateTableLinkData = {
-            leftColumnLabel: args.leftColumnLabel,
-            rightColumnLabel: args.rightColumnLabel
-          };
-          result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}`, 'PUT', updateTableLinkData);
+          result = await api.makeRequest(`/tableLinks/${id('tableLinkId')}`, 'PUT', pick(args, ['leftColumnLabel', 'rightColumnLabel']));
           break;
+
         case 'linkTableRecords':
-          const linkData = {
-            leftRecord: args.leftRecord,
-            rightRecord: args.rightRecord
-          };
-          result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}/link`, 'PUT', linkData);
+          result = await api.makeRequest(`/tableLinks/${id('tableLinkId')}/link`, 'PUT', pick(args, ['leftRecord', 'rightRecord']));
           break;
 
         case 'unlinkTableRecords':
-          const unlinkData = {
-            leftRecord: args.leftRecord,
-            rightRecord: args.rightRecord
-          };
-          result = await this.apiClient.makeRequest(`/tableLinks/${args.tableLinkId}/unlink`, 'PUT', unlinkData);
+          result = await api.makeRequest(`/tableLinks/${id('tableLinkId')}/unlink`, 'PUT', pick(args, ['leftRecord', 'rightRecord']));
           break;
 
         // ========================================
@@ -162,35 +189,23 @@ export class ToolHandlers {
         // ========================================
 
         case 'createTableAggregation':
-          const createAggData = {
-            field: args.field,
-            fn: args.fn,
-            label: args.label,
-            tableId: args.tableId,
-          };
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/aggregations`, 'POST', createAggData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/aggregations`, 'POST', pick(args, ['field', 'fn', 'label', 'tableId']));
           break;
 
         case 'getTableAggregation':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/aggregation/${args.aggregationId}`);
+          result = await api.makeRequest(`/tables/${id('tableId')}/aggregation/${id('aggregationId')}`);
           break;
 
         case 'listTableAggregations':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/aggregations`);
+          result = await api.makeRequest(`/tables/${id('tableId')}/aggregations`, 'GET', null, pick(args, ['field', 'fn']));
           break;
 
         case 'updateTableAggregation':
-          const updateAggData = {
-            field: args.field,
-            fn: args.fn,
-            label: args.label,
-            tableId: args.tableId
-          };
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/aggregation/${args.aggregationId}`, 'PUT', updateAggData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/aggregation/${id('aggregationId')}`, 'PUT', pick(args, ['field', 'fn', 'label', 'tableId']));
           break;
 
         case 'deleteTableAggregation':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/aggregation/${args.aggregationId}`, 'DELETE');
+          result = await api.makeRequest(`/tables/${id('tableId')}/aggregation/${id('aggregationId')}`, 'DELETE');
           break;
 
         // ========================================
@@ -198,43 +213,27 @@ export class ToolHandlers {
         // ========================================
 
         case 'createTableQuery':
-          const createQueryData = {
-            label: args.label,
-            tableId: args.tableId,
-            filters: args.filters || [],
-            filterAggregator: args.filterAggregator,
-            sortOptions: args.sortOptions || [],
-            limit: args.limit
-          };
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/queries`, 'POST', createQueryData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/queries`, 'POST', queryBody(args));
           break;
 
         case 'getTableQuery':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/query/${args.queryId}`);
+          result = await api.makeRequest(`/tables/${id('tableId')}/query/${id('queryId')}`);
           break;
 
         case 'listTableQueries':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/queries`);
+          result = await api.makeRequest(`/tables/${id('tableId')}/queries`);
           break;
 
         case 'updateTableQuery':
-          const updateQueryData = {
-            label: args.label,
-            tableId: args.tableId,
-            filters: args.filters || [],
-            filterAggregator: args.filterAggregator,
-            sortOptions: args.sortOptions || [],
-            limit: args.limit
-          };
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/query/${args.queryId}`, 'PUT', updateQueryData);
+          result = await api.makeRequest(`/tables/${id('tableId')}/query/${id('queryId')}`, 'PUT', queryBody(args));
           break;
 
         case 'deleteTableQuery':
-          result = await this.apiClient.makeRequest(`/tables/${args.tableId}/query/${args.queryId}`, 'DELETE');
+          result = await api.makeRequest(`/tables/${id('tableId')}/query/${id('queryId')}`, 'DELETE');
           break;
 
         case 'signUrls':
-          result = await this.apiClient.makeRequest('/signURLs', 'POST', { urls: args.urls });
+          result = await api.makeRequest('/signURLs', 'POST', { urls: args.urls });
           break;
 
         // ========================================
@@ -242,46 +241,34 @@ export class ToolHandlers {
         // ========================================
 
         case 'listInterfaces':
-          const interfaceQueryParams = {};
-          if (args.limit) interfaceQueryParams.limit = args.limit;
-          if (args.offset) interfaceQueryParams.offset = args.offset;
-          if (args.sort) interfaceQueryParams.sort = args.sort;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/interfaces'), 'GET', null, interfaceQueryParams);
+          result = await api.makeRequest(stations('/interfaces'), 'GET', null, pick(args, LIST_PARAMS));
           break;
 
         case 'createInterface':
-          const createInterfaceBody = {
-            name: args.name,
-            stationId: args.stationId,
-          };
-          const createInterfaceQuery = {};
-          if (args.replaceInterfaceAtStation !== undefined) {
-            createInterfaceQuery.replaceInterfaceAtStation = args.replaceInterfaceAtStation;
-          }
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/interfaces'), 'POST', createInterfaceBody, createInterfaceQuery);
+          result = await api.makeRequest(stations('/interfaces'), 'POST',
+            pick(args, ['name', 'stationId', 'isRegistrationLinkReusable']), pick(args, ['replaceInterfaceAtStation']));
           break;
 
         case 'getInterface':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}`));
+          result = await api.makeRequest(stations(`/interfaces/${id('interfaceId')}`));
           break;
 
         case 'updateInterface':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}`), 'PATCH', args.interfaceData);
+          result = await api.makeRequest(stations(`/interfaces/${id('interfaceId')}`), 'PATCH', args.interfaceData);
           break;
 
         case 'archiveInterface':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/archive`), 'POST');
+          result = await api.makeRequest(stations(`/interfaces/${id('interfaceId')}/archive`), 'POST');
           break;
 
         case 'deleteInterfaceStationAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'DELETE');
+          result = await api.makeRequest(stations(`/interfaces/${id('interfaceId')}/station-assignment`), 'DELETE');
           break;
 
         case 'updateInterfaceStationAssignment':
-          const updateStationAssignmentData = {};
-          if (args.stationId) updateStationAssignmentData.stationId = args.stationId;
-          if (args.replaceInterfaceAtStation !== undefined) updateStationAssignmentData.replaceInterfaceAtStation = args.replaceInterfaceAtStation;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/interfaces/${args.interfaceId}/station-assignment`), 'PUT', updateStationAssignmentData);
+          // replaceInterfaceAtStation is a query parameter; in the body it is ignored
+          result = await api.makeRequest(stations(`/interfaces/${id('interfaceId')}/station-assignment`), 'PUT',
+            pick(args, ['stationId']), pick(args, ['replaceInterfaceAtStation']));
           break;
 
         // ========================================
@@ -289,33 +276,28 @@ export class ToolHandlers {
         // ========================================
 
         case 'listStationGroups':
-          const stationGroupQueryParams = {};
-          if (args.limit) stationGroupQueryParams.limit = args.limit;
-          if (args.offset) stationGroupQueryParams.offset = args.offset;
-          if (args.sort) stationGroupQueryParams.sort = args.sort;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/station-groups'), 'GET', null, stationGroupQueryParams);
+          result = await api.makeRequest(stations('/station-groups'), 'GET', null, pick(args, LIST_PARAMS));
           break;
 
         case 'createStationGroup':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/station-groups'), 'POST', args.stationGroupData);
+          result = await api.makeRequest(stations('/station-groups'), 'POST', args.stationGroupData);
           break;
 
         case 'getStationGroup':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}`));
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}`));
           break;
 
         case 'updateStationGroup':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}`), 'PATCH', args.stationGroupData);
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}`), 'PATCH', args.stationGroupData);
           break;
 
         case 'archiveStationGroup':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/archive`), 'POST');
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/archive`), 'POST');
           break;
 
         case 'updateStationGroupStations':
-          const stationGroupStationsData = {};
-          if (args.stationIds) stationGroupStationsData.stationIds = args.stationIds;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/stations`), 'PATCH', stationGroupStationsData);
+          if (!args.add?.length && !args.remove?.length) throw new Error('Pass station IDs in add and/or remove.');
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/stations`), 'PATCH', pick(args, ['add', 'remove']));
           break;
 
         // ========================================
@@ -323,27 +305,23 @@ export class ToolHandlers {
         // ========================================
 
         case 'listStations':
-          const stationQueryParams = {};
-          if (args.limit) stationQueryParams.limit = args.limit;
-          if (args.offset) stationQueryParams.offset = args.offset;
-          if (args.sort) stationQueryParams.sort = args.sort;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/stations'), 'GET', null, stationQueryParams);
+          result = await api.makeRequest(stations('/stations'), 'GET', null, pick(args, LIST_PARAMS));
           break;
 
         case 'createStation':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl('/stations'), 'POST', args.stationData);
+          result = await api.makeRequest(stations('/stations'), 'POST', args.stationData);
           break;
 
         case 'getStation':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}`));
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}`));
           break;
 
         case 'updateStation':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}`), 'PATCH', args.stationData);
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}`), 'PATCH', args.stationData);
           break;
 
         case 'archiveStation':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/archive`), 'POST');
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/archive`), 'POST');
           break;
 
         // ========================================
@@ -351,30 +329,23 @@ export class ToolHandlers {
         // ========================================
 
         case 'listStationAppAssignments':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments`));
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/app-assignments`), 'GET', null, pick(args, ['limit', 'offset']));
           break;
 
         case 'createStationAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments`), 'POST', args.appAssignmentData);
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/app-assignments`), 'POST', args.appAssignmentData);
           break;
 
         case 'deleteStationAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'DELETE');
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/app-assignments/${id('appAssignmentId')}`), 'DELETE');
           break;
 
         case 'manageStationAppAssignment':
-          const manageStationAppData = {
-            type: args.type,
-            tag: args.tag
-          };
-          if (args.appFolderId) manageStationAppData.appFolderId = args.appFolderId;
-          if (args.appId) manageStationAppData.appId = args.appId;
-          if (args.appVersionId) manageStationAppData.appVersionId = args.appVersionId;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments/${args.appAssignmentId}`), 'PUT', manageStationAppData);
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/app-assignments/${id('appAssignmentId')}`), 'PUT', pick(args, ASSIGNMENT_FIELDS));
           break;
 
         case 'removeAllStationAppAssignments':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/stations/${args.stationId}/app-assignments`), 'DELETE');
+          result = await api.makeRequest(stations(`/stations/${id('stationId')}/app-assignments`), 'DELETE');
           break;
 
         // ========================================
@@ -382,30 +353,23 @@ export class ToolHandlers {
         // ========================================
 
         case 'listStationGroupAppAssignments':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments`));
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/app-assignments`), 'GET', null, pick(args, ['limit', 'offset']));
           break;
 
         case 'createStationGroupAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments`), 'POST', args.appAssignmentData);
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/app-assignments`), 'POST', args.appAssignmentData);
           break;
 
         case 'deleteStationGroupAppAssignment':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments/${args.appAssignmentId}`), 'DELETE');
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/app-assignments/${id('appAssignmentId')}`), 'DELETE');
           break;
 
         case 'manageStationGroupAppAssignment':
-          const manageStationGroupAppData = {
-            type: args.type,
-            tag: args.tag
-          };
-          if (args.appFolderId) manageStationGroupAppData.appFolderId = args.appFolderId;
-          if (args.appId) manageStationGroupAppData.appId = args.appId;
-          if (args.appVersionId) manageStationGroupAppData.appVersionId = args.appVersionId;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments/${args.appAssignmentId}`), 'PUT', manageStationGroupAppData);
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/app-assignments/${id('appAssignmentId')}`), 'PUT', pick(args, ASSIGNMENT_FIELDS));
           break;
 
         case 'removeAllStationGroupAppAssignments':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenApiUrl(`/station-groups/${args.stationGroupId}/app-assignments`), 'DELETE');
+          result = await api.makeRequest(stations(`/station-groups/${id('stationGroupId')}/app-assignments`), 'DELETE');
           break;
 
         // ========================================
@@ -413,51 +377,43 @@ export class ToolHandlers {
         // ========================================
 
         case 'listUserRoles':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl('/roles'));
+          result = await api.makeRequest(users('/roles'));
           break;
 
         case 'getUserRole':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/roles/${args.userRoleId}`));
+          result = await api.makeRequest(users(`/roles/${id('userRoleId')}`));
           break;
 
         case 'listUserGroups':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl('/user-groups'));
+          result = await api.makeRequest(users('/user-groups'), 'GET', null, pick(args, LIST_PARAMS));
           break;
 
         case 'getUserGroup':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/user-groups/${args.userGroupId}`));
+          result = await api.makeRequest(users(`/user-groups/${id('userGroupId')}`));
           break;
 
         case 'getUserGroupUsers':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/user-groups/${args.userGroupId}/users`));
+          result = await api.makeRequest(users(`/user-groups/${id('userGroupId')}/users`), 'GET', null, pick(args, ['limit', 'offset', 'filter']));
           break;
 
         case 'listUsers':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl('/users'));
+          result = await api.makeRequest(users('/users'), 'GET', null, pick(args, LIST_PARAMS));
           break;
 
         case 'getUser':
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}`));
+          result = await api.makeRequest(users(`/users/${id('userId')}`));
           break;
 
         case 'listUserUserGroups':
-          const userGroupsQueryParams = {};
-          if (args.limit) userGroupsQueryParams.limit = args.limit;
-          if (args.offset) userGroupsQueryParams.offset = args.offset;
-          if (args.filter) userGroupsQueryParams.filter = args.filter;
-          result = await this.apiClient.makeRequest(this.apiClient.createNextGenUsersApiUrl(`/users/${args.userId}/user-groups`), 'GET', null, userGroupsQueryParams);
+          result = await api.makeRequest(users(`/users/${id('userId')}/user-groups`), 'GET', null, pick(args, ['limit', 'offset', 'filter']));
           break;
 
         default:
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Tool implementation needed: ${name} - This tool is defined but needs specific implementation based on the Tulip API parameters.`,
-              },
-            ],
-          };
+          throw new Error(`Tool ${name} has no handler.`);
       }
+
+      // Successful writes with no response body (204) still report success
+      if (result === '' || result === null || result === undefined) result = { success: true };
 
       return {
         content: [

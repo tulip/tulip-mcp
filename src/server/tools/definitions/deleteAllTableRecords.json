@@ -6,12 +6,15 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table to delete all records from"
+        "description": "The ID of the table to delete all records from",
+        "minLength": 1
+      },
+      "allowRecordsInUse": {
+        "type": "boolean",
+        "description": "Also delete records that are in use by a running app. Without it the request fails with 422 if any record is in use."
       }
     },
-    "required": [
-      "tableId"
-    ]
+    "required": ["tableId"]
   },
   "category": "admin",
   "type": "table",

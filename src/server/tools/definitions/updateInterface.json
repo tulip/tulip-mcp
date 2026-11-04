@@ -6,17 +6,22 @@
     "properties": {
       "interfaceId": {
         "type": "string",
-        "description": "The ID of the interface to update"
+        "description": "The ID of the interface to update",
+        "minLength": 1
       },
       "interfaceData": {
         "type": "object",
-        "description": "Updated interface data"
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "New interface name.",
+            "minLength": 1
+          }
+        },
+        "required": ["name"]
       }
     },
-    "required": [
-      "interfaceId",
-      "interfaceData"
-    ]
+    "required": ["interfaceId", "interfaceData"]
   },
   "category": "write",
   "type": "interface",

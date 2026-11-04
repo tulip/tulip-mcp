@@ -6,17 +6,16 @@
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The ID of the station group"
+        "description": "The ID of the station group",
+        "minLength": 1
       },
       "appAssignmentId": {
         "type": "string",
-        "description": "The ID of the app assignment to delete"
+        "description": "The ID of the app assignment to delete",
+        "minLength": 1
       }
     },
-    "required": [
-      "stationGroupId",
-      "appAssignmentId"
-    ]
+    "required": ["stationGroupId", "appAssignmentId"]
   },
   "category": "admin",
   "type": "station-group",
