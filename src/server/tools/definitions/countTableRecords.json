@@ -41,7 +41,7 @@
             },
             "arg": {
               "type": "string",
-              "description": "Value to compare to. Omit for 'blank' and 'notBlank'. For timestamps use an ISO 8601 string."
+              "description": "Value to compare to. Omit for 'blank' and 'notBlank'. Numbers and booleans may be sent as text; they are converted to the column's type. For isIn/notIsIn give a comma list (\"A,B\") or a JSON array. Interval values are in seconds. For timestamps use an ISO 8601 string."
             }
           },
           "required": [

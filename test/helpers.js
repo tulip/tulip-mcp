@@ -9,7 +9,8 @@ import { ApiClient } from '../src/server/networking/ApiClient.js';
  * still built by the real buildUrl, so tests see exactly what would be sent.
  *
  * respond(call) returns the response body or throws, where call is
- * { endpoint, method, query, url }.
+ * { endpoint, method, query, url }. dataCalls leaves out GET /tables/{id}
+ * lookups of column types.
  */
 export function fakeApiClient(respond, { workspaceId } = {}) {
   const client = new ApiClient(
@@ -24,6 +25,7 @@ export function fakeApiClient(respond, { workspaceId } = {}) {
     { maxRetries: 0, baseDelay: 1, maxDelay: 1 },
   );
   client.calls = [];
+  Object.defineProperty(client, 'dataCalls', { get: () => client.calls.filter(c => !/^\/tables\/[^/]+$/.test(c.endpoint)) });
   client.makeRequest = async (endpoint, method = 'GET', body = null, queryParams = {}) => {
     const url = client.buildUrl(endpoint, queryParams);
     const query = Object.fromEntries(url.searchParams);
@@ -51,5 +53,8 @@ export const coffeeTable = {
     { name: 'qty', dataType: { type: 'integer' } },
     { name: 'started', dataType: { type: 'timestamp' } },
     { name: 'photo', dataType: { type: 'imageUrl' } },
+    { name: 'price', dataType: { type: 'float' } },
+    { name: 'wait', dataType: { type: 'interval' } },
+    { name: 'paid', dataType: { type: 'boolean' } },
   ],
 };
