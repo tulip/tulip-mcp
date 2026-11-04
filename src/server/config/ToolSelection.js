@@ -86,11 +86,12 @@ export class ToolSelection {
             this.enabledTools.add(tool);
           });
         }
-        // Check if it's a tool type
+        // Check if it's a tool type. Types never enable admin (destructive)
+        // tools; those need the admin category or the tool's own name.
         else if (this.toolTypes[item]) {
           this.enabledToolTypes.add(item);
           this.toolTypes[item].forEach(tool => {
-            this.enabledTools.add(tool);
+            if (!this.dangerousTools.has(tool)) this.enabledTools.add(tool);
           });
         }
         else {

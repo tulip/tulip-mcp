@@ -1,9 +1,33 @@
 {
   "name": "listUsers",
-  "description": "Gets a list of users. Corresponds to GET /api/users/v1/users. Requires `users:read` scope. [READ-ONLY]",
+  "description": "Lists users, one page at a time (response has `count` and `nextPage`). Corresponds to GET /api/users/v1/users. Requires `users:read` scope. Deactivated users are only listed with archived=true. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
-    "properties": {},
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of items (0-200).",
+        "minimum": 0,
+        "maximum": 200
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Number of items to skip.",
+        "minimum": 0
+      },
+      "search": {
+        "type": "string",
+        "description": "Text search."
+      },
+      "filter": {
+        "type": "string",
+        "description": "OData filter on id, badgeId, name/full, email/verified, globalRoleId or workspaceRoleAssignments, e.g. badgeId eq 'JS001'. Quote values with single quotes."
+      },
+      "archived": {
+        "type": "boolean",
+        "description": "List deactivated items instead of active ones."
+      }
+    },
     "required": []
   },
   "category": "read-only",

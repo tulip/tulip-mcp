@@ -6,37 +6,41 @@
     "properties": {
       "stationId": {
         "type": "string",
-        "description": "The id of the station to update."
+        "description": "The id of the station to update.",
+        "minLength": 1
       },
       "appAssignmentId": {
         "type": "string",
-        "description": "The id of the app assignment to update."
+        "description": "The id of the app assignment to update.",
+        "minLength": 1
       },
       "type": {
         "type": "string",
-        "description": "The type of app assignment"
+        "description": "\"all\" apps, an \"app-folder\", one \"app\", or one \"app-version\".",
+        "enum": ["all", "app-folder", "app", "app-version"]
       },
       "tag": {
         "type": "string",
-        "description": "The tag of an app assignment. Determines if the app assignment refers to the development version of an app or the latest production version."
+        "description": "Which app version runs: the development version or the latest published one.",
+        "enum": ["development", "latest-published"]
       },
       "appFolderId": {
         "type": "string",
-        "description": "The ID of the app folder"
+        "description": "App folder ID (type app-folder)."
       },
       "appId": {
         "type": "string",
-        "description": "The ID of the app"
+        "description": "App ID (type app, and type app-version)."
       },
       "appVersionId": {
         "type": "string",
-        "description": "The ID of the app version"
+        "description": "App version ID (type app-version)."
       }
     },
-    "required": ["stationId", "appAssignmentId", "type", "tag"]
+    "required": ["stationId", "appAssignmentId", "type"]
   },
   "category": "write",
-  "type": "app",
+  "type": "station",
   "dangerous": false,
   "httpType": "PUT",
   "url": "/api/stations/v1/stations/:stationId/app-assignments/:appAssignmentId"

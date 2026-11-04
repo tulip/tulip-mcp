@@ -37,13 +37,18 @@ Column IDs from this response are needed when creating records or running aggreg
 
 **Create a new table:**
 ```
-createTable(tableData={ name: "My Table", columns: [...] })
+createTable(tableData={ label: "My Table", description: "", columns: [
+  { name: "id", label: "ID", description: "", dataType: { type: "string" }, hidden: false, unique: true },
+  { name: "qty", label: "Quantity", description: "", dataType: { type: "integer" }, hidden: false, unique: false }
+] })
 ```
 
-**Update a table (rename or add/modify columns):**
+**Update a table (rename or add columns):**
 ```
-updateTable(tableId="<tableId>", tableData={ ... })
+updateTable(tableId="<tableId>", tableData={ label, description, columns })
 ```
+The update replaces the whole definition: start from `getTable` and send back every
+existing column unchanged, plus any new ones. Column data types cannot change.
 
 ---
 
@@ -77,7 +82,7 @@ countTableRecords(tableId="<tableId>")
 
 **Create a record:**
 ```
-createTableRecord(tableId="<tableId>", recordData={ fieldId: "value", ... })
+createTableRecord(tableId="<tableId>", recordData={ id: "<unique id>", <columnName>: "value", ... })
 ```
 Use column IDs (not column names) as keys in `recordData`. Get column IDs from `getTable`.
 
@@ -117,10 +122,12 @@ updateTableQuery(tableId="<tableId>", queryId="<queryId>", label="...", filters=
 deleteTableQuery(tableId="<tableId>", queryId="<queryId>")
 ```
 
-Filter object shape:
+Saved-query filter shape (different from the `arg` used by listTableRecords):
 ```json
-{ "field": "<columnId>", "functionType": "equal", "arg": "value" }
+{ "field": "<columnName>", "functionType": "equal", "value": { "datasourceType": "static", "params": { "value": "OPEN" } } }
 ```
+Query labels are at most 40 characters. Saved queries and aggregations need the
+`table-queries:read` / `table-queries:write` API key scopes.
 Supported `functionType` values: `equal`, `notEqual`, `greaterThan`, `lessThan`,
 `greaterThanOrEqual`, `lessThanOrEqual`, `contains`, `notContains`, `isEmpty`, `isNotEmpty`.
 

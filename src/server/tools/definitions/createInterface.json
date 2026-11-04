@@ -15,12 +15,13 @@
       "replaceInterfaceAtStation": {
         "type": "boolean",
         "description": "If set to true, indicates that if there is already an interface at the station it will be replaced"
+      },
+      "isRegistrationLinkReusable": {
+        "type": "boolean",
+        "description": "Allow the registration link to be used more than once."
       }
     },
-    "required": [
-      "name",
-      "stationId"
-    ]
+    "required": ["name", "stationId"]
   },
   "category": "write",
   "type": "interface",

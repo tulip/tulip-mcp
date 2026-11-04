@@ -6,20 +6,19 @@
     "properties": {
       "tableLinkId": {
         "type": "string",
-        "description": "ID of the table link to update"
+        "description": "ID of the table link to update",
+        "minLength": 1
       },
       "leftColumnLabel": {
         "type": "string",
-        "description": "New label for the left column in the linking relationship"
+        "description": "Label of the link column in the left table. Both labels are required; resend the current label for the side you are not changing."
       },
-       "rightColumnLabel": {
+      "rightColumnLabel": {
         "type": "string",
-        "description": "New label for the right column in the linking relationship"
+        "description": "Label of the link column in the right table."
       }
     },
-    "required": [
-      "tableLinkId"
-    ]
+    "required": ["tableLinkId", "leftColumnLabel", "rightColumnLabel"]
   },
   "category": "write",
   "type": "table",

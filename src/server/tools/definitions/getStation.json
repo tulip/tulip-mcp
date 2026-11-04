@@ -6,12 +6,11 @@
     "properties": {
       "stationId": {
         "type": "string",
-        "description": "The ID of the station to retrieve"
+        "description": "The ID of the station to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "stationId"
-    ]
+    "required": ["stationId"]
   },
   "category": "read-only",
   "type": "station",

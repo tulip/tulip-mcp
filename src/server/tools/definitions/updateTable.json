@@ -1,22 +1,76 @@
 {
   "name": "updateTable",
-  "description": "Updates a Tulip Table. This modifies table structure and can affect existing data. Corresponds to PUT /tables/{tableId}. Requires `tables:write` scope. [WRITE]",
+  "description": "Updates a Tulip Table's name, description and columns. Corresponds to PUT /tables/{tableId}. Requires `tables:write` scope. The request replaces the whole definition: call getTable first and send back label, description and ALL existing columns (including id and link columns) unchanged, plus any new columns. Existing column data types cannot change. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table to update"
+        "description": "The ID of the table to update",
+        "minLength": 1
       },
       "tableData": {
         "type": "object",
-        "description": "Updated table data"
+        "description": "The full table definition (from getTable, with your changes).",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Table name (1-255 characters).",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "description": "Table description; may be \"\"."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Column definitions.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Column ID: starts with a letter, then letters, digits or underscores (max 50).",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+                  "maxLength": 50
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Display label."
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Column description; may be \"\"."
+                },
+                "dataType": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "Column data type.",
+                      "enum": ["string", "integer", "float", "boolean", "timestamp", "interval", "user", "imageUrl", "color"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                "hidden": {
+                  "type": "boolean",
+                  "description": "Hide the column in the Tables UI."
+                },
+                "unique": {
+                  "type": "boolean",
+                  "description": "Must be false for every column except id."
+                }
+              },
+              "required": ["name", "label", "description", "dataType", "hidden", "unique"]
+            }
+          }
+        },
+        "required": ["label", "description", "columns"]
       }
     },
-    "required": [
-      "tableId",
-      "tableData"
-    ]
+    "required": ["tableId", "tableData"]
   },
   "category": "write",
   "type": "table",

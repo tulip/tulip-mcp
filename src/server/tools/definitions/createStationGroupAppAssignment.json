@@ -6,17 +6,40 @@
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The ID of the station group"
+        "description": "The ID of the station group",
+        "minLength": 1
       },
       "appAssignmentData": {
         "type": "object",
-        "description": "App assignment data"
+        "description": "App assignment. all/app-folder/app need `tag`; app-folder needs appFolderId; app needs appId; app-version needs appVersionId.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "\"all\" apps, an \"app-folder\", one \"app\", or one \"app-version\".",
+            "enum": ["all", "app-folder", "app", "app-version"]
+          },
+          "tag": {
+            "type": "string",
+            "description": "Which app version runs: the development version or the latest published one.",
+            "enum": ["development", "latest-published"]
+          },
+          "appFolderId": {
+            "type": "string",
+            "description": "App folder ID (type app-folder)."
+          },
+          "appId": {
+            "type": "string",
+            "description": "App ID (type app)."
+          },
+          "appVersionId": {
+            "type": "string",
+            "description": "App version ID (type app-version)."
+          }
+        },
+        "required": ["type"]
       }
     },
-    "required": [
-      "stationGroupId",
-      "appAssignmentData"
-    ]
+    "required": ["stationGroupId", "appAssignmentData"]
   },
   "category": "write",
   "type": "station-group",

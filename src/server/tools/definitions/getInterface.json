@@ -6,12 +6,11 @@
     "properties": {
       "interfaceId": {
         "type": "string",
-        "description": "The ID of the interface to retrieve"
+        "description": "The ID of the interface to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "interfaceId"
-    ]
+    "required": ["interfaceId"]
   },
   "category": "read-only",
   "type": "interface",

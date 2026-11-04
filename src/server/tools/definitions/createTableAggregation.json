@@ -1,24 +1,26 @@
 {
   "name": "createTableAggregation",
-  "description": "Creates a new Tulip Table aggregation in the specified Table. Corresponds to POST /tables/{tableId}/aggregations. Requires `tables:write` scope. [WRITE]",
+  "description": "Creates a new Tulip Table aggregation in the specified Table. Corresponds to POST /tables/{tableId}/aggregations. Requires `table-queries:write` scope. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The id of a Tulip Table."
+        "description": "The id of a Tulip Table.",
+        "minLength": 1
       },
       "field": {
         "type": "string",
-        "description": "The field to aggregate on"
+        "description": "Column name from getTable .columns[].name (not the label)."
       },
       "fn": {
         "type": "string",
-        "description": "The aggregation function to apply"
+        "description": "Aggregation function.",
+        "enum": ["sum", "count", "avg", "min", "max", "mode", "uniqueValues"]
       },
       "label": {
         "type": "string",
-        "description": "The label for the aggregation"
+        "description": "Display label for the aggregation."
       }
     },
     "required": ["tableId", "field", "fn", "label"]

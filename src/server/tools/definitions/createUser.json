@@ -1,27 +1,28 @@
 {
   "name": "createUser",
-  "description": "Creates a new Tulip User with specified role. This creates actual user accounts in your Tulip instance. Use with extreme caution. Corresponds to POST /users. Requires `users:write` scope. [ADMIN]",
+  "description": "Creates a Tulip operator. Corresponds to POST /users. Requires `users:write` scope. This endpoint can only create operators (role \"operator\"); it is rate limited to 30 requests per minute and returns 422 when the account's user limit is reached. [ADMIN]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "role": {
         "type": "string",
-        "description": "The role to assign to the user"
+        "description": "Must be \"operator\".",
+        "enum": ["operator"]
       },
       "name": {
         "type": "string",
-        "description": "The name of the user"
+        "description": "Operator name (1-200 characters).",
+        "minLength": 1,
+        "maxLength": 200
       },
       "badge_id": {
         "type": "string",
-        "description": "Badge ID for the user"
+        "description": "Badge ID (1-200 characters).",
+        "minLength": 1,
+        "maxLength": 200
       }
     },
-    "required": [
-      "role",
-      "name",
-      "badge_id"
-    ]
+    "required": ["role", "name"]
   },
   "category": "admin",
   "type": "user",

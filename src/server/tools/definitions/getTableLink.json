@@ -6,12 +6,11 @@
     "properties": {
       "tableLinkId": {
         "type": "string",
-        "description": "The ID of the table link"
+        "description": "Table link ID: the dataType.tableLinkID of a tableLink column in getTable.",
+        "minLength": 1
       }
     },
-    "required": [
-      "tableLinkId"
-    ]
+    "required": ["tableLinkId"]
   },
   "category": "read-only",
   "type": "table",

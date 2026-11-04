@@ -6,12 +6,11 @@
     "properties": {
       "userId": {
         "type": "string",
-        "description": "The ID of the user to retrieve"
+        "description": "The ID of the user to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "userId"
-    ]
+    "required": ["userId"]
   },
   "category": "read-only",
   "type": "user",

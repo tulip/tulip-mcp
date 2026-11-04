@@ -6,12 +6,11 @@
     "properties": {
       "userRoleId": {
         "type": "string",
-        "description": "The ID of the user role to retrieve"
+        "description": "The ID of the user role to retrieve",
+        "minLength": 1
       }
     },
-    "required": [
-      "userRoleId"
-    ]
+    "required": ["userRoleId"]
   },
   "category": "read-only",
   "type": "user",

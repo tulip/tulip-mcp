@@ -6,19 +6,12 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table"
+        "description": "The ID of the table",
+        "minLength": 1
       },
       "function": {
         "type": "string",
-        "enum": [
-          "sum",
-          "count",
-          "avg",
-          "min",
-          "max",
-          "mode",
-          "uniqueValues"
-        ],
+        "enum": ["sum", "count", "avg", "min", "max", "mode", "uniqueValues"],
         "description": "Aggregate function. Numeric fields: all. Text: count, mode, uniqueValues. Boolean: count, mode. Timestamp: min, max, count, uniqueValues. Image, file and linked-record fields cannot be aggregated. uniqueValues returns at most 1000 values."
       },
       "fieldId": {
@@ -42,16 +35,10 @@
             },
             "sortDir": {
               "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
+              "enum": ["asc", "desc"]
             }
           },
-          "required": [
-            "sortBy",
-            "sortDir"
-          ]
+          "required": ["sortBy", "sortDir"]
         },
         "description": "Which records to keep when there are more than `limit`, in priority order. Default: [{\"sortBy\":\"_createdAt\",\"sortDir\":\"desc\"}] (newest first). Note: the API currently returns 500 for _sequenceNumber here; use _createdAt."
       },
@@ -66,24 +53,7 @@
             },
             "functionType": {
               "type": "string",
-              "enum": [
-                "equal",
-                "notEqual",
-                "blank",
-                "notBlank",
-                "greaterThan",
-                "greaterThanOrEqual",
-                "lessThan",
-                "lessThanOrEqual",
-                "contains",
-                "notContains",
-                "startsWith",
-                "notStartsWith",
-                "endsWith",
-                "notEndsWith",
-                "isIn",
-                "notIsIn"
-              ],
+              "enum": ["equal", "notEqual", "blank", "notBlank", "greaterThan", "greaterThanOrEqual", "lessThan", "lessThanOrEqual", "contains", "notContains", "startsWith", "notStartsWith", "endsWith", "notEndsWith", "isIn", "notIsIn"],
               "description": "Comparison function."
             },
             "arg": {
@@ -91,27 +61,17 @@
               "description": "Value to compare to. Omit for 'blank' and 'notBlank'. Numbers and booleans may be sent as text; they are converted to the column's type. For isIn/notIsIn give a comma list (\"A,B\") or a JSON array. Interval values are in seconds. For timestamps use an ISO 8601 string."
             }
           },
-          "required": [
-            "field",
-            "functionType"
-          ]
+          "required": ["field", "functionType"]
         },
         "description": "Filters applied before aggregating. Example: [{\"field\":\"status\",\"functionType\":\"equal\",\"arg\":\"OPEN\"}]"
       },
       "filterAggregator": {
         "type": "string",
-        "enum": [
-          "all",
-          "any"
-        ],
+        "enum": ["all", "any"],
         "description": "How to combine filters. Default 'all'."
       }
     },
-    "required": [
-      "tableId",
-      "function",
-      "fieldId"
-    ]
+    "required": ["tableId", "function", "fieldId"]
   },
   "category": "read-only",
   "type": "table",

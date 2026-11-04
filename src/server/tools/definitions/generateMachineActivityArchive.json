@@ -1,17 +1,16 @@
 {
   "name": "generateMachineActivityArchive",
-  "description": "⚠️ ADMIN OPERATION ⚠️ Generates a machine activity archive for a given machine ID. This creates server load and should be used sparingly. Corresponds to POST /machines/archive/{machineID}. Requires the `machines:write` API key scope. [ADMIN]",
+  "description": "⚠️ ADMIN OPERATION ⚠️ Generates a machine activity archive for a given machine ID. This creates server load and should be used sparingly. Corresponds to POST /machines/archive/{machineID}. Requires the `machines:write` API key scope. Returns a job `id`; pass it as jobId to retrieveMachineActivityArchive. [ADMIN]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "machineId": {
         "type": "string",
-        "description": "The ID of the machine to generate archive for"
+        "description": "The ID of the machine to generate archive for",
+        "minLength": 1
       }
     },
-    "required": [
-      "machineId"
-    ]
+    "required": ["machineId"]
   },
   "category": "admin",
   "type": "machine",

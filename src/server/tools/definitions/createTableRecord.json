@@ -6,17 +6,23 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table to create record in"
+        "description": "The ID of the table to create record in",
+        "minLength": 1
       },
       "recordData": {
         "type": "object",
-        "description": "Record data to create"
+        "description": "Field values keyed by column name (getTable .columns[].name, not labels). Must include a unique string `id`.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique record ID.",
+            "minLength": 1
+          }
+        },
+        "required": ["id"]
       }
     },
-    "required": [
-      "tableId",
-      "recordData"
-    ]
+    "required": ["tableId", "recordData"]
   },
   "category": "write",
   "type": "table",

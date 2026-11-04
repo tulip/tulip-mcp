@@ -6,11 +6,10 @@
 
 import minimist from 'minimist';
 import { TulipMCPServer } from './server/TulipMCPServer.js';
-import { logger } from './server/utils/Logger.js';
 
 // Add global error handlers
 process.on('uncaughtException', (error) => {
-  logger.debug('Uncaught Exception:', error);
+  console.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
@@ -31,6 +30,6 @@ try {
     process.exit(1);
   });
 } catch (error) {
-  logger.debug('Failed to initialize server:', error);
+  console.error(`Failed to start the Tulip MCP server: ${error.message}`);
   process.exit(1);
 }

@@ -6,7 +6,8 @@
     "properties": {
       "tableLinkId": {
         "type": "string",
-        "description": "The ID of the table link"
+        "description": "The ID of the table link",
+        "minLength": 1
       },
       "leftRecord": {
         "type": "string",
@@ -17,11 +18,7 @@
         "description": "ID of the right record to link"
       }
     },
-    "required": [
-      "tableLinkId",
-      "leftRecord",
-      "rightRecord"
-    ]
+    "required": ["tableLinkId", "leftRecord", "rightRecord"]
   },
   "category": "write",
   "type": "table",

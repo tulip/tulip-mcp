@@ -78,12 +78,12 @@ getUserRole(userRoleId="<userRoleId>")
 
 ### Create a user
 
-**Create a new user:**
+**Create a new operator:**
 ```
-createUser(role="<roleName>", name="Jane Smith", badge_id="JS001")
+createUser(role="operator", name="Jane Smith", badge_id="JS001")
 ```
 
-- `role`: The role to assign (get valid role names from `listUserRoles`)
+- `role`: Must be `operator`; the API can only create operators
 - `name`: Display name for the user
 - `badge_id`: The badge ID used for shop floor login — must be unique
 
@@ -95,7 +95,7 @@ name, role, and badge ID with the user before calling.
 ## Common patterns
 
 ### "Who's in this system?"
-1. `listUsers()` — all users with names and roles
+1. `listUsers()` — active users with names and roles, one page at a time (use `limit`/`offset`; `archived=true` for deactivated users)
 2. `listUserRoles()` — what roles exist
 3. `getUser(userId)` on anyone you want more detail on
 

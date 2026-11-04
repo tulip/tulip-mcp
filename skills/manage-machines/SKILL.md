@@ -39,22 +39,21 @@ Use this to write data into Tulip from an external source — for example, pushi
 cycle count or machine status from an external system.
 
 ```
-reportAttributes(attributes={
-  "<machineId>/<attributeId>": <value>,
-  "<machineId>/<attributeId>": <value>
-})
+reportAttributes(attributes=[
+  {"machineId": "<machineId>", "attributeId": "<attributeId>", "value": <value>}
+])
 ```
 
-The `attributes` object maps `machineId/attributeId` keys to the values to report.
-Get machine IDs from `listMachineTypes()`. Attribute IDs must be known in advance —
-they are configured inside the Tulip instance.
+`attributes` is a list of `{machineId, attributeId, value}` entries. Get machine IDs
+from `listMachineTypes()`. Attribute IDs must be known in advance — they are
+configured inside the Tulip instance. The API key needs the `attributes:report` scope.
 
 Example:
 ```json
-{
-  "machine-001/attr-cycle-count": 142,
-  "machine-001/attr-status": "running"
-}
+[
+  {"machineId": "machine-001", "attributeId": "attr-cycle-count", "value": 142},
+  {"machineId": "machine-001", "attributeId": "attr-status", "value": "running"}
+]
 ```
 
 ---
@@ -68,7 +67,7 @@ for OEE analysis, downtime tracking, or feeding data into external systems.
 ```
 generateMachineActivityArchive(machineId="<machineId>")
 ```
-Returns a `jobId`. This kicks off an async export job on the server.
+Returns a job `id`; pass it as `jobId` in step 2. This kicks off an async export job on the server.
 
 **Step 2 — Poll for the result:**
 ```

@@ -6,17 +6,23 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table"
+        "description": "The ID of the table",
+        "minLength": 1
       },
       "recordId": {
         "type": "string",
-        "description": "The ID of the record to retrieve"
+        "description": "The ID of the record to retrieve",
+        "minLength": 1
+      },
+      "fields": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Only return these columns."
       }
     },
-    "required": [
-      "tableId",
-      "recordId"
-    ]
+    "required": ["tableId", "recordId"]
   },
   "category": "read-only",
   "type": "table",

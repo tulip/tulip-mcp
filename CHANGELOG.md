@@ -2,10 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
-This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.html).
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.1] - 2026-11-04
+## [1.4.0] - 2026-11-04
+Every tool was audited against the Tulip API specs and server code, and checked live.
+
 ### Fixed
+- IDs in request paths are URL-encoded and must be non-empty. A record ID such as `PO#1` or `A/B` could address a different record, and an empty ID could turn a single delete into a delete of every record or app assignment
+- Writes (POST/PATCH) are no longer retried after a server error or dropped connection, so a create or increment cannot be applied twice; writes never follow redirects; every request has a timeout (`MCP_REQUEST_TIMEOUT`, default 60s)
+- Station, station group and interface tools returned 400 when `TULIP_WORKSPACE_ID` was unset; they now use the `DEFAULT` workspace, and workspace errors say what to set (#9)
+- `signUrls` and `reportAttributes` returned 404 whenever `TULIP_WORKSPACE_ID` was set
+- `reportAttributes` sent the wrong body; it now takes a list of `{machineId, attributeId, value}`
+- `updateStationGroupStations` sent `stationIds`, which the API ignored; it now takes `add` / `remove` lists
+- `updateInterfaceStationAssignment` sent `replaceInterfaceAtStation` in the body, where it was ignored
+- `deleteInterfaceStationAssignment` had no `interfaceId` input
+- `createTableQuery` / `updateTableQuery` failed because filters need an `_id`; one is now generated
+- `deleteTableAggregation` and other empty JSON responses raised a parse error; empty write responses now report success, and deleting a record that does not exist says so
+- Calls with missing required arguments, or with no arguments object, now fail with a clear message instead of calling `/undefined` URLs or crashing
+- `MCP_MAX_RETRIES=0` and `MCP_BASE_DELAY=0` were ignored; startup errors were only logged in debug mode
+- Tool descriptions named the wrong API key scopes for saved queries and aggregations (`table-queries:*`), `reportAttributes` (`attributes:report`) and `signUrls` (`urls:sign`)
 - Filters on integer, interval and `_sequenceNumber` columns returned HTTP 422 `ValueIsInvalid` when `arg` was text (e.g. `"1"`). Filter args are now converted to the column's type before sending
 - `isIn` / `notIsIn` filters returned HTTP 400 `InvalidJSON` unless `arg` was a JSON array. A comma list (`"A,B"`), a JSON array string or a single value now work
 - `runTableAggregation` returned interval values in milliseconds while records and filters use seconds. Interval results are now converted to seconds, with a note
@@ -13,6 +28,12 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 
 ### Changed
 - The npm package now ships only the server, skills and plugin files, not the test suite or development scripts
+- A tool type in `ENABLED_TOOLS` (e.g. `table`) no longer enables that type's admin tools (deletes, archives, user creation); use the `admin` category or the tool name. The app assignment tools now belong to the `station` / `station-group` types
+- `tools/list` sends MCP annotations (`readOnlyHint`, `destructiveHint`) instead of internal fields
+
+### Added
+- Input schemas describe the real request bodies for tables, records, queries, aggregations, links, stations, station groups, interfaces and app assignments, with enums and limits
+- Paging and filtering: `listTables` (`limit`, `offset`, `includeDeleted`), `listUsers` (`limit`, `offset`, `search`, `filter`, `archived`), `listUserGroups` (`search`, `filter`, `archived`), `getUserGroupUsers`, station / station group / interface lists (`filter`, `search`, `archived`), app assignment lists (`limit`, `offset`), `listTableAggregations` (`field`, `fn`), `getTableRecord` (`fields`), `deleteAllTableRecords` (`allowRecordsInUse`), `createInterface` (`isRegistrationLinkReusable`)
 
 ## [1.3.0] - 2026-11-03
 ### Fixed

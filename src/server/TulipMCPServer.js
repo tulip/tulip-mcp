@@ -16,6 +16,12 @@ import { ApiClient } from './networking/ApiClient.js';
 import { ToolDefinitions } from './tools/definitions/index.js';
 import { ToolHandlers } from './tools/ToolHandlers.js';
 
+const ANNOTATIONS = {
+  'read-only': { readOnlyHint: true, openWorldHint: true },
+  write: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+  admin: { readOnlyHint: false, destructiveHint: true, openWorldHint: true },
+};
+
 /**
  * Main Tulip MCP Server class that orchestrates all components
  */
@@ -65,15 +71,22 @@ export class TulipMCPServer {
       const allTools = this.toolDefinitions.getAllToolDefinitions();
       const enabledTools = allTools.filter(tool => this.toolSelection.isToolEnabled(tool.name));
 
+      // Clients only get the MCP fields; category and dangerous become
+      // annotations so they can tell reads from writes and destructive calls
       return {
-        tools: enabledTools,
+        tools: enabledTools.map(({ name, description, inputSchema, category }) => ({
+          name,
+          description,
+          inputSchema,
+          annotations: ANNOTATIONS[category] ?? ANNOTATIONS.write,
+        })),
       };
     });
 
     // Call tool handler
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const { name, arguments: args } = request.params;
-      return await this.toolHandlers.handleToolCall(name, args);
+      return await this.toolHandlers.handleToolCall(name, args ?? {});
     });
   }
 

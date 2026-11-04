@@ -1,17 +1,31 @@
 {
   "name": "getUserGroupUsers",
-  "description": "Gets users in a specific user group. Corresponds to GET /api/users/v1/user-groups/{userGroupId}/users. Requires `users:read` scope. [READ-ONLY]",
+  "description": "Lists the IDs of the users in a user group (use getUser for details). Corresponds to GET /api/users/v1/user-groups/{userGroupId}/users. Requires `users:read` scope. [READ-ONLY]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "userGroupId": {
         "type": "string",
-        "description": "The ID of the user group"
+        "description": "The ID of the user group",
+        "minLength": 1
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of items (0-200).",
+        "minimum": 0,
+        "maximum": 200
+      },
+      "offset": {
+        "type": "integer",
+        "description": "Number of items to skip.",
+        "minimum": 0
+      },
+      "filter": {
+        "type": "string",
+        "description": "OData-style filter, e.g. userId eq '<id>'."
       }
     },
-    "required": [
-      "userGroupId"
-    ]
+    "required": ["userGroupId"]
   },
   "category": "read-only",
   "type": "user",

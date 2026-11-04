@@ -18,7 +18,8 @@
           },
           "relationshipType": {
             "type": "string",
-            "description": "The type of relationship (e.g., one-to-one, one-to-many, many-to-many)"
+            "description": "Relationship between the tables.",
+            "enum": ["one-to-one", "one-to-many", "many-to-one", "many-to-many"]
           },
           "leftColumnLabel": {
             "type": "string",
@@ -29,16 +30,10 @@
             "description": "A label for the column in the right table"
           }
         },
-        "required": [
-          "leftTableId",
-          "rightTableId",
-          "relationshipType"
-        ]
+        "required": ["leftTableId", "rightTableId", "relationshipType"]
       }
     },
-    "required": [
-      "linkData"
-    ]
+    "required": ["linkData"]
   },
   "category": "write",
   "type": "table",

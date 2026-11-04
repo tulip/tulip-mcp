@@ -6,27 +6,24 @@
     "properties": {
       "tableId": {
         "type": "string",
-        "description": "The ID of the table"
+        "description": "The ID of the table",
+        "minLength": 1
       },
       "recordId": {
         "type": "string",
-        "description": "The ID of the record"
+        "description": "The ID of the record",
+        "minLength": 1
       },
       "fieldName": {
         "type": "string",
-        "description": "The field (column) to increment or decrement."
+        "description": "Numeric column to increment or decrement. Column name from getTable .columns[].name (not the label)."
       },
       "value": {
         "type": "number",
         "description": "The amount to increment or decrement, can be positive or negative"
       }
     },
-    "required": [
-      "tableId",
-      "recordId",
-      "fieldName",
-      "value"
-    ]
+    "required": ["tableId", "recordId", "fieldName", "value"]
   },
   "category": "write",
   "type": "table",

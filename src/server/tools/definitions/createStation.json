@@ -6,12 +6,63 @@
     "properties": {
       "stationData": {
         "type": "object",
-        "description": "Station data for creating new station"
+        "description": "Station fields.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Station name.",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Description."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone, e.g. America/New_York."
+          },
+          "stationGroupId": {
+            "type": "string",
+            "description": "Station group to add the station to."
+          },
+          "appAssignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "App assignment. all/app-folder/app need `tag`; app-folder needs appFolderId; app needs appId; app-version needs appVersionId.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "\"all\" apps, an \"app-folder\", one \"app\", or one \"app-version\".",
+                  "enum": ["all", "app-folder", "app", "app-version"]
+                },
+                "tag": {
+                  "type": "string",
+                  "description": "Which app version runs: the development version or the latest published one.",
+                  "enum": ["development", "latest-published"]
+                },
+                "appFolderId": {
+                  "type": "string",
+                  "description": "App folder ID (type app-folder)."
+                },
+                "appId": {
+                  "type": "string",
+                  "description": "App ID (type app)."
+                },
+                "appVersionId": {
+                  "type": "string",
+                  "description": "App version ID (type app-version)."
+                }
+              },
+              "required": ["type"]
+            },
+            "description": "Apps to assign."
+          }
+        },
+        "required": ["name"]
       }
     },
-    "required": [
-      "stationData"
-    ]
+    "required": ["stationData"]
   },
   "category": "write",
   "type": "station",

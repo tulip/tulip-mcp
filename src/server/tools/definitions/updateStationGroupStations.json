@@ -1,19 +1,27 @@
 {
   "name": "updateStationGroupStations",
-  "description": "Updates the list of stations in a station group. Corresponds to PATCH /api/stations/v1/station-groups/{stationGroupId}/stations. Requires `stations:write` scope. [WRITE]",
+  "description": "Adds stations to and/or removes stations from a station group. Corresponds to PATCH /api/stations/v1/station-groups/{stationGroupId}/stations. Requires `stations:write` scope. [WRITE]",
   "inputSchema": {
     "type": "object",
     "properties": {
       "stationGroupId": {
         "type": "string",
-        "description": "The id of the station group that the stations will be updated for."
+        "description": "The id of the station group that the stations will be updated for.",
+        "minLength": 1
       },
-      "stationIds": {
+      "add": {
         "type": "array",
         "items": {
           "type": "string"
         },
-        "description": "Array of station IDs to include in the station group"
+        "description": "Station IDs to add."
+      },
+      "remove": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Station IDs to remove."
       }
     },
     "required": ["stationGroupId"]

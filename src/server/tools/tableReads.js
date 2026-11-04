@@ -24,6 +24,8 @@
  *   allowed on boolean, image, file or linked-record fields.
  */
 
+import { pathSegment } from '../networking/ApiClient.js';
+
 export const AGGREGATION_MAX_LIMIT = 100000;
 export const RECORDS_PAGE_MAX = 100;
 export const LIST_RECORDS_MAX = 1000;
@@ -82,7 +84,7 @@ function toOptionalInt(value) {
 function columnTypeLoader(apiClient, tableId) {
   let pending;
   return () => {
-    pending ??= apiClient.makeRequest(`/tables/${tableId}`)
+    pending ??= apiClient.makeRequest(`/tables/${pathSegment(tableId, 'tableId')}`)
       .then(table => new Map((table?.columns || []).map(c => [c.name, c.dataType?.type])))
       .catch(() => new Map());
     return pending;
@@ -188,7 +190,7 @@ export async function countTableRecords(apiClient, rawArgs, loadColumnTypes = co
   const filters = toJsonParam(args.filters, 'filters');
   if (filters) query.filters = filters;
   if (args.filterAggregator) query.filterAggregator = args.filterAggregator;
-  return Number(await apiClient.makeRequest(`/tables/${args.tableId}/count`, 'GET', null, query));
+  return Number(await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/count`, 'GET', null, query));
 }
 
 function isInvalidFieldTypeError(error) {
@@ -212,7 +214,7 @@ async function runTimestampAggregation(apiClient, args, query) {
       throw new Error(`count on timestamp field "${args.fieldId}" cannot be combined with filterAggregator "any": the API rejects count on timestamp fields, and the workaround needs to AND a notBlank filter. Use filterAggregator "all", or count "id" instead.`);
     }
     const countQuery = { ...query, fieldId: 'id', filters: JSON.stringify([...userFilters, notBlank]) };
-    const { result } = await apiClient.makeRequest(`/tables/${args.tableId}/runAggregation`, 'GET', null, countQuery);
+    const { result } = await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/runAggregation`, 'GET', null, countQuery);
     return {
       result,
       notes: [`The Tables API does not support count on timestamp fields, so this counted records where "${args.fieldId}" is not blank.`],
@@ -233,7 +235,7 @@ async function runTimestampAggregation(apiClient, args, query) {
   const maxPages = anyAggregator ? MAX_FALLBACK_SCAN_PAGES : 1;
   let value = null;
   for (let page = 0; page < maxPages && value === null; page++) {
-    const rows = await apiClient.makeRequest(`/tables/${args.tableId}/records`, 'GET', null,
+    const rows = await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/records`, 'GET', null,
       buildRecordsQuery(recordArgs, { limit: pageSize, offset: page * pageSize }));
     const hit = rows.find(row => row[args.fieldId] !== null && row[args.fieldId] !== undefined);
     if (hit) value = hit[args.fieldId];
@@ -258,7 +260,7 @@ export async function runTableAggregation(apiClient, rawArgs) {
 
   let response;
   try {
-    const { result } = await apiClient.makeRequest(`/tables/${args.tableId}/runAggregation`, 'GET', null, query);
+    const { result } = await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/runAggregation`, 'GET', null, query);
     response = { result, notes: [] };
   } catch (error) {
     if (!isInvalidFieldTypeError(error) || !TIMESTAMP_FALLBACK_FUNCTIONS.has(args['function'])) throw error;
@@ -309,7 +311,7 @@ export async function listTableRecords(apiClient, rawArgs) {
 
   let records;
   if (args.limit === undefined || args.limit <= RECORDS_PAGE_MAX) {
-    records = await apiClient.makeRequest(`/tables/${args.tableId}/records`, 'GET', null,
+    records = await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/records`, 'GET', null,
       buildRecordsQuery(args, { limit: args.limit, offset }));
   } else {
     if (parseList(args.sortOptions).length === 0) {
@@ -318,7 +320,7 @@ export async function listTableRecords(apiClient, rawArgs) {
     records = [];
     while (records.length < args.limit) {
       const pageLimit = Math.min(RECORDS_PAGE_MAX, args.limit - records.length);
-      const page = await apiClient.makeRequest(`/tables/${args.tableId}/records`, 'GET', null,
+      const page = await apiClient.makeRequest(`/tables/${pathSegment(args.tableId, 'tableId')}/records`, 'GET', null,
         buildRecordsQuery(args, { limit: pageLimit, offset: offset + records.length }));
       records.push(...page);
       if (page.length < pageLimit) break;
