@@ -326,3 +326,18 @@ describe('interval aggregations are reported in seconds', () => {
     assert.deepEqual(out.notes, []);
   });
 });
+
+describe('uniqueValues cap', () => {
+  const unique = n => {
+    const api = fakeApiClient(({ endpoint }) => (endpoint === '/tables/T1' ? coffeeTable : endpoint.endsWith('/count') ? 5000 : { result: Array.from({ length: n }, (_, i) => `v${i}`) }));
+    return runTableAggregation(api, { tableId: 'T1', function: 'uniqueValues', fieldId: 'status' });
+  };
+
+  test('a full 1000-value result says more values may exist', async () => {
+    assert.match((await unique(1000)).notes.join(' '), /at most 1000 unique values/);
+  });
+
+  test('fewer than 1000 values adds no cap note', async () => {
+    assert.ok(!(await unique(999)).notes.join(' ').includes('unique values'));
+  });
+});

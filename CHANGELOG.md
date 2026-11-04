@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](httpss://semver.org/spec/v2.0.0.ht
 - Filters on integer, interval and `_sequenceNumber` columns returned HTTP 422 `ValueIsInvalid` when `arg` was text (e.g. `"1"`). Filter args are now converted to the column's type before sending
 - `isIn` / `notIsIn` filters returned HTTP 400 `InvalidJSON` unless `arg` was a JSON array. A comma list (`"A,B"`), a JSON array string or a single value now work
 - `runTableAggregation` returned interval values in milliseconds while records and filters use seconds. Interval results are now converted to seconds, with a note
+- `runTableAggregation` `uniqueValues` silently stopped at 1000 values. The result now carries a note when the cap is reached, and the tool description lists which functions each field type supports (booleans do not support `uniqueValues`)
 
 ## [1.3.0] - 2026-11-03
 ### Fixed

@@ -19,7 +19,7 @@
           "mode",
           "uniqueValues"
         ],
-        "description": "Aggregate function. Numeric fields: all. Text/boolean: count, mode, uniqueValues. Timestamp: min, max, count, uniqueValues."
+        "description": "Aggregate function. Numeric fields: all. Text: count, mode, uniqueValues. Boolean: count, mode. Timestamp: min, max, count, uniqueValues. Image, file and linked-record fields cannot be aggregated. uniqueValues returns at most 1000 values."
       },
       "fieldId": {
         "type": "string",
