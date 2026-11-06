@@ -1,4 +1,6 @@
 # owner: secops
+# Same scan as tulip/tulip/.github/workflows/gitleaks.yml. Differences are
+# lint-only (zizmor): expressions moved into env, checkout pinned by SHA.
 name: Gitleaks
 
 on:
@@ -20,15 +22,18 @@ jobs:
         id: set-fetch-depth
         shell: bash
         env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_COMMITS: ${{ github.event.pull_request.commits }}
           COMMITS_JSON: ${{ toJson(github.event.commits) }}
         run: |
-          if [ "${{ github.event_name }}" == "push" ]; then
+          if [ "$EVENT_NAME" == "push" ]; then
             DEPTH=$(($(jq length <<< "$COMMITS_JSON") + 2))
-            BRANCH="${{ github.ref_name }}"
-          elif [ "${{ github.event_name }}" == "pull_request" ]; then
-            DEPTH=$((${{ github.event.pull_request.commits }} + 2))
-            BRANCH="${PR_HEAD_REF}"
+            BRANCH="$REF_NAME"
+          elif [ "$EVENT_NAME" == "pull_request" ]; then
+            DEPTH=$((PR_COMMITS + 2))
+            BRANCH="$PR_HEAD_REF"
           fi
 
           echo "depth=$DEPTH" >> "$GITHUB_OUTPUT"
@@ -36,26 +41,36 @@ jobs:
           echo "Configured fetch depth: $DEPTH for branch: $BRANCH"
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ steps.set-fetch-depth.outputs.branch }}
           fetch-depth: ${{ steps.set-fetch-depth.outputs.depth }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Run Gitleaks scan
-        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           GITLEAKS_CONFIG: .gitleaks.toml
           # Keep the pinned action SHA, but use gitleaks 8.30.1 internally.
           # The action defaults to 8.24.3, which does not honor allowlist
-          # `paths` during git scans and flags allowlisted translation files.
+          # `paths` during git scans.
           GITLEAKS_VERSION: 8.30.1
 
       - name: Send results to Panther SIEM
         if: failure()
         shell: bash
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_ID: ${{ github.event.pull_request.number }}
+          BRANCH_NAME: ${{ steps.set-fetch-depth.outputs.branch }}
+          PANTHER_HEADER_NAME: ${{ secrets.PANTHER_HEADER_NAME }}
+          PANTHER_SHARED_SECRET: ${{ secrets.PANTHER_SHARED_SECRET }}
+          PANTHER_HTTP_ENDPOINT: ${{ secrets.PANTHER_HTTP_ENDPOINT }}
         run: |
           if [ -f "results.sarif" ]; then
             # Check if SARIF contains actual results (leaks detected)
@@ -64,28 +79,19 @@ jobs:
             if [ "$results_count" -gt 0 ]; then
               echo "Detected $results_count leak(s), sending to Panther SIEM..."
 
-              # Parse SARIF and send to Panther HTTP log endpoint
               timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-              repository="${{ github.repository }}"
-              ref="${{ github.ref }}"
-              sha="${{ github.sha }}"
-
-              # Create structured log entry for Panther
-              pr_id="${{ github.event.pull_request.number }}"
-              branch_name="${{ steps.set-fetch-depth.outputs.branch }}"
 
               # Remove rules array from SARIF to reduce payload size
-              # Only keep the actual results, not all rule definitions
               filtered_sarif=$(jq 'del(.runs[].tool.driver.rules)' < results.sarif)
 
               jq -n \
                 --arg timestamp "$timestamp" \
-                --arg repository "$repository" \
-                --arg ref "$ref" \
-                --arg sha "$sha" \
-                --arg event_type "${{ github.event_name }}" \
-                --arg pr_id "$pr_id" \
-                --arg branch_name "$branch_name" \
+                --arg repository "$REPOSITORY" \
+                --arg ref "$REF" \
+                --arg sha "$SHA" \
+                --arg event_type "$EVENT_NAME" \
+                --arg pr_id "$PR_ID" \
+                --arg branch_name "$BRANCH_NAME" \
                 --argjson sarif "$filtered_sarif" \
                 '{
                   timestamp: $timestamp,
@@ -102,9 +108,9 @@ jobs:
               # Send to Panther HTTP log endpoint with shared secret authentication
               curl -X POST \
                 -H "Content-Type: application/json" \
-                -H "${{ secrets.PANTHER_HEADER_NAME }}: ${{ secrets.PANTHER_SHARED_SECRET }}" \
+                -H "${PANTHER_HEADER_NAME}: ${PANTHER_SHARED_SECRET}" \
                 -d @panther_payload.json \
-                "${{ secrets.PANTHER_HTTP_ENDPOINT }}" || echo "Failed to send to Panther SIEM"
+                "${PANTHER_HTTP_ENDPOINT}" || echo "Failed to send to Panther SIEM"
             else
               echo "No leaks detected in SARIF results, skipping Panther notification"
             fi
